@@ -13,7 +13,9 @@ _SIMILAR = 0.85  # difflib ratio of OCR-folded names to treat them as the same m
 def clean_name(text: str) -> str:
     s = re.sub(r"(?<=[a-z])\.(?=\s*[A-Z])", ",", text)  # comma misread as a period: "Dungeon.Forest"
     s = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", s)  # OCR drops spaces: "TreeDungeon" -> "Tree Dungeon"
+    s = re.sub(r"(?<=[a-z])(?=\d)", " ", s)     # "Market8>" -> "Market 8>"
     s = re.sub(r"\s*,\s*", ", ", s)
+    s = re.sub(r"\s*<?\s*(\d{1,2})\s*>$", r" <\1>", s)  # room numbers: "Free Market 8>" -> "Free Market <8>"
     s = re.sub(r"\s+", " ", s).strip(" ,")
     words = s.split(" ")
     last = words[-1]
@@ -32,6 +34,14 @@ def parse_minimap(boxes) -> tuple[str | None, str] | None:
     right = max(p[0] for p in header[0])
     bottom = max(p[1] for p in header[0])
     top_of = lambda b: min(p[1] for p in b[0])
+    # Collapsed minimap (common in full screen): the title row itself reads "Street : Map".
+    header_top = min(p[1] for p in header[0])
+    for b in boxes:
+        ys = [p[1] for p in b[0]]
+        if b is not header and ":" in b[1] and max(p[0] for p in b[0]) < right and min(ys) < bottom and max(ys) > header_top:
+            street, _, name = b[1].partition(":")
+            if sum(c.isalpha() for c in name) >= 3:
+                return clean_name(street), clean_name(name)
     lines = sorted((b for b in boxes if bottom < top_of(b) < bottom + 90 and min(p[0] for p in b[0]) < right),
                    key=top_of)
     texts = [clean_name(b[1]) for b in lines if sum(c.isalpha() for c in b[1]) >= 3]

@@ -49,8 +49,8 @@ game's terms of service - see the [disclaimer](#disclaimer).
 ## Requirements
 
 - Windows 10 or 11
-- MapleStory Classic running **in windowed mode**, with the EXP bar visible
-  (open the minimap if you want the map detected)
+- MapleStory Classic in **windowed or full-screen** mode, with the EXP bar visible
+  (open the minimap if you want the map detected - collapsed is fine)
 
 ## Install
 
@@ -100,6 +100,9 @@ reopens by itself. (From source you can also run **`update.bat`**; a `git clone`
 Tips:
 
 - **Don't cover the EXP bar** with another window - EXPERT skips that reading and tells you.
+- **Full screen works.** EXPERT opens on your second monitor if you have one, otherwise in the
+  top-right corner. Press Start, click back into the game within 3 seconds, and the chime tells
+  you when the summary is ready.
 - Drag the window by its orange title bar. The pin button keeps it above other windows.
 - If a number or the map name was misread, use **Manual fix** (`תיקון ידני`) in the summary.
   A corrected map name is remembered, so the same map is always written the same way.
@@ -118,7 +121,7 @@ for personal use, e.g. with Audacity's *Windows WASAPI* loopback recording.)
 | "MapleStory is not open" | Start the game first; EXPERT looks for its window. |
 | "Another window is covering the EXP bar" | Move the other window (or EXPERT) off the bottom of the game. |
 | "Windows protected your PC" | Click **More info → Run anyway** (see [Install](#install)). |
-| Black screenshot | Switch the game from full screen to windowed mode. |
+| Black screenshot | Your PC runs the game in exclusive full screen - switch the game to windowed mode. |
 | Map not detected | Open the minimap in the game, or type the map in **Manual fix**. |
 | Update failed | The reason is in `update.log` in the EXPERT folder; you can always update by hand (see [Update](#update)). |
 | Something else | Check `app.log` in the EXPERT folder and [open an issue](https://github.com/oryanzz/EXPERT/issues). |

@@ -29,3 +29,11 @@ def test_reads_map_from_real_screenshot(reader):
     # the crisp pixel font read "Dumgeon" until the slight blur before OCR
     assert name == "Tree Dungeon, Forest Up North IV"
     assert canonical_name(name, ["Tree Dungeon, Forest Up North IV", "Ant Tunnel I"]) == name
+
+
+FULLSCREEN = Path(__file__).parent / "fixtures" / "fullscreen_minimap_collapsed.png"
+
+
+def test_reads_collapsed_minimap_in_full_screen(reader):
+    # 2560x1440 full screen: the game is letterboxed and its UI scaled, so the title row is wider
+    assert reader.read_map(Image.open(FULLSCREEN)) == ("Hidden Street", "Free Market <8>")

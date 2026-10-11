@@ -9,8 +9,15 @@ from PIL import Image, ImageFilter
 from .minimap import parse_minimap
 from .parse import EXP_LABEL, Reading, parse_status
 
-BAR_HEIGHT = 80  # the classic status bar is ~60px tall regardless of resolution
-MAP_CORNER = (600, 160)  # the minimap's header (title + street + map name) sits in this top-left area
+# Crop sizes grow with the screen: in full screen the game scales its UI up (and may letterbox it),
+# so the status bar gets taller and the minimap title row wider than in a 1920x1200 window.
+def bar_height(h: int) -> int:
+    return int(max(80, h * 0.06))  # the classic status bar is ~60px tall at 1200px
+
+
+def map_corner(w: int, h: int) -> tuple[int, int]:
+    """The top-left area holding the minimap header (title row + street + map name)."""
+    return min(w, int(max(600, w * 0.32))), min(h, int(max(160, h * 0.12)))
 
 
 @dataclass
@@ -37,7 +44,7 @@ class BarReader:
     def read(self, image: Image.Image) -> BarResult | None:
         w, h = image.size
         # fall back to a taller strip in case the UI is scaled up
-        for strip_h in dict.fromkeys((min(BAR_HEIGHT, h), h // 5)):
+        for strip_h in dict.fromkeys((min(bar_height(h), h), h // 5)):
             top = h - strip_h
             strip = np.array(image.crop((0, top, w, h)).convert("RGB"))
             with self._lock:
@@ -50,8 +57,7 @@ class BarReader:
 
     def read_map(self, image: Image.Image) -> tuple[str | None, str] | None:
         """(street, map) from the minimap header in the top-left corner, or None if it isn't showing."""
-        w, h = image.size
-        corner = image.crop((0, 0, min(MAP_CORNER[0], w), min(MAP_CORNER[1], h))).convert("RGB")
+        corner = image.crop((0, 0) + map_corner(*image.size)).convert("RGB")
         # the minimap's crisp pixel font OCRs badly ("Moumtainm"); a slight blur reads it right
         corner = np.array(corner.filter(ImageFilter.GaussianBlur(0.9)))
         with self._lock:

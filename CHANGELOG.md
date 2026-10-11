@@ -3,6 +3,15 @@
 All notable changes to EXPERT are listed here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.1.1] - 2026-10-11
+
+### Fixed
+- **Full screen.** Tested live with the game in full screen at 2560x1440 (letterboxed, UI scaled up):
+  - the map is read from a collapsed minimap's title row ("Hidden Street : Free Market <8>");
+  - the EXP-bar and minimap crop areas scale with the screen instead of assuming a 1920x1200 window;
+  - EXPERT opens on another monitor when the game is full screen (or in the top-right corner of a
+    single monitor) instead of in the middle of the game.
+
 ## [1.1.0] - 2026-10-11
 
 ### Added
@@ -59,6 +68,7 @@ First public release.
 - Custom end sound via `sounds/done.wav`.
 - `setup.bat` installer with desktop shortcut, and `run.bat`.
 
+[1.1.1]: https://github.com/oryanzz/EXPERT/releases/tag/v1.1.1
 [1.1.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.1.0
 [1.0.3]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.3
 [1.0.2]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.2

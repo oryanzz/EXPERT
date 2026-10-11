@@ -21,7 +21,7 @@ make_dpi_aware()  # must happen before any window exists
 
 import webview  # noqa: E402
 
-from maple_exp.layout import fitted_height  # noqa: E402
+from maple_exp.layout import dock_position, fitted_height  # noqa: E402
 from maple_exp.update import check_for_update  # noqa: E402
 from maple_exp.history import append_session, known_maps, load_recent, replace_last  # noqa: E402
 from maple_exp.minimap import MapVotes, canonical_name  # noqa: E402
@@ -439,6 +439,7 @@ class MONITORINFO(ctypes.Structure):
 user32.MonitorFromWindow.argtypes = [wt.HWND, wt.DWORD]
 user32.MonitorFromWindow.restype = wt.HMONITOR
 user32.GetMonitorInfoW.argtypes = [wt.HMONITOR, ctypes.POINTER(MONITORINFO)]
+user32.EnumDisplayMonitors.argtypes = [wt.HDC, ctypes.POINTER(wt.RECT), ctypes.c_void_p, wt.LPARAM]
 
 
 def monitor_work_area(hwnd: int) -> wt.RECT | None:
@@ -470,12 +471,35 @@ def create_main_window(api: "Api"):
     return window
 
 
+def monitor_work_areas(hwnd: int) -> list[tuple[int, int, int, int]]:
+    """Work areas of all monitors (taskbar excluded), the one showing `hwnd` first."""
+    found = []
+
+    @ctypes.WINFUNCTYPE(wt.BOOL, wt.HMONITOR, wt.HDC, ctypes.POINTER(wt.RECT), wt.LPARAM)
+    def collect(hmon, _dc, _rect, _lp):
+        mi = MONITORINFO()
+        mi.cbSize = ctypes.sizeof(MONITORINFO)
+        if user32.GetMonitorInfoW(hmon, ctypes.byref(mi)):
+            w = mi.rcWork
+            found.append((hmon, (w.left, w.top, w.right, w.bottom)))
+        return True
+
+    user32.EnumDisplayMonitors(None, None, collect, 0)
+    own = user32.MonitorFromWindow(hwnd, 2)  # MONITOR_DEFAULTTONEAREST
+    found.sort(key=lambda m: m[0] != own)
+    return [area for _, area in found]
+
+
 def initial_position():
-    """Dock beside the game window when there is room, so we never cover the EXP bar."""
+    """Open where we never cover the game's EXP bar: beside a windowed game, or on another
+    monitor / in the top-right corner when the game is full screen (see maple_exp/layout.py)."""
     hwnd = find_game()
     rect = game_rect(hwnd) if hwnd else None
     if not rect:
         return None, None
+    scale = ctypes.windll.user32.GetDpiForSystem() / 96
+    x, y = dock_position(rect, monitor_work_areas(hwnd), int(WIN_W * scale))
+    return int(x / scale), int(y / scale)
     u = ctypes.windll.user32
     scale = u.GetDpiForSystem() / 96
     screen_right = u.GetSystemMetrics(76) + u.GetSystemMetrics(78)  # virtual screen left + width

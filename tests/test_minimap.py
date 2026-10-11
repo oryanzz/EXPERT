@@ -75,3 +75,21 @@ def test_map_votes_ignore_empty_reads_and_tie_goes_to_first():
     v.add("Rocky Road II")
     v.add("Rocky Road I")
     assert (v.best, v.count) == ("Rocky Road II", 2)
+
+
+# Full screen at 2560x1440, minimap collapsed to its title row: "Street : Map" left of WORLD
+COLLAPSED = [box(143, 10, 463, 30, "HiddenStreet:FreeMarket8>"), box(550, 13, 608, 26, "WORLD"),
+             box(588, 153, 662, 175, "CHEAP")]
+
+
+def test_collapsed_minimap_title_row_holds_street_and_map():
+    assert parse_minimap(COLLAPSED) == ("Hidden Street", "Free Market <8>")
+
+
+def test_expanded_minimap_label_is_not_mistaken_for_a_name():
+    assert parse_minimap(TREE_DUNGEON)[1] == "Tree Dungeon, Forest Up North IV"
+
+
+def test_clean_name_room_number():
+    assert clean_name("Free Market8>") == "Free Market <8>"
+    assert clean_name("Free Market <12>") == "Free Market <12>"
