@@ -267,7 +267,7 @@ function wireUpdate() {
     const btn = $("updateBtn");
     btn.disabled = true; btn.textContent = "מעדכן…";
     const res = await api.start_update();  // on success the app closes and reopens updated
-    if (!res.ok) { btn.disabled = false; btn.textContent = "עדכן עכשיו"; $("updateBar").title = res.error; alert(res.error); }
+    if (!res.ok) { btn.disabled = false; btn.textContent = "עדכון"; $("updateBar").title = res.error; alert(res.error); }
   });
 }
 

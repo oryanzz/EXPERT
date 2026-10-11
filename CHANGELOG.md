@@ -3,6 +3,11 @@
 All notable changes to EXPERT are listed here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- The update button is now a single word: `עדכון`.
+
 ## [1.0.2] - 2026-10-11
 
 ### Added

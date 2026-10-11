@@ -66,7 +66,7 @@ game's terms of service - see the [disclaimer](#disclaimer).
 ## Update
 
 EXPERT checks GitHub for a new version when it starts. When one is out, a banner appears at the
-top of the window: click **Update now** (`עדכן עכשיו`). EXPERT closes, downloads the new version,
+top of the window: click **Update** (`עדכון`). EXPERT closes, downloads the new version,
 keeps your history, screenshots, custom sound and settings, and reopens by itself.
 You can also double-click **`update.bat`** (for a `git clone` it runs `git pull`).
 
