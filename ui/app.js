@@ -276,6 +276,24 @@ function wireUpdate() {
   });
 }
 
+// ---------- global show/hide key ----------
+async function applyHotkey(spec) {
+  const res = await api.set_hotkey(spec);
+  const chip = $("keyChip");
+  chip.classList.toggle("taken", !res.ok);
+  chip.title = res.ok
+    ? (spec === "off" ? "אין מקש להצגה/הסתרה" : `${spec} מציג ומסתיר את EXPERT, גם מתוך המשחק`)
+    : `${spec} תפוס ע״י Windows או תוכנה אחרת. בחר מקש אחר`;
+}
+
+function wireHotkey() {
+  const pick = $("hotkey");
+  pick.value = store.get("hotkey", "F11");
+  if (!pick.value) pick.value = "F11";
+  pick.addEventListener("change", () => { store.set("hotkey", pick.value); applyHotkey(pick.value); });
+  applyHotkey(pick.value);
+}
+
 // ---------- compact mode (full-screen play) ----------
 let compact = false;
 let lastCompact = "";
@@ -360,6 +378,7 @@ window.addEventListener("pywebviewready", () => {
   wire();
   wireUpdate();
   wireCompact();
+  wireHotkey();
   if (store.get("compact", "0") === "1") setCompact(true);
   api.app_info().then((i) => { $("appVersion").textContent = "v" + i.version; });
   api.check_update().then(showUpdate);

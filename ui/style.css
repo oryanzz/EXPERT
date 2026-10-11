@@ -104,7 +104,21 @@ svg { width: 18px; height: 18px; flex: none; }
 .update-btn:active { transform: translateY(2px); box-shadow: 0 0 0 var(--wood-dark); }
 
 .status-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
-.tagline { font-size: 11px; font-weight: 800; letter-spacing: 2.4px; color: var(--wood); }
+.status-end { display: flex; align-items: center; gap: 8px; }
+.key-chip {
+  display: inline-flex; align-items: center; gap: 3px; height: 26px; padding: 0 2px 0 7px;
+  border: 2px solid var(--wood); border-radius: 999px; background: var(--cream); color: var(--wood);
+  box-shadow: 0 2px 0 var(--wood-dark); cursor: pointer;
+}
+.key-chip svg { width: 15px; height: 15px; }
+.key-chip select {
+  border: 0; background: transparent; color: var(--wood); cursor: pointer; direction: ltr;
+  font: 800 12px "Nunito", "Rubik", sans-serif; padding: 0 2px; outline: none;
+  field-sizing: content; max-width: 104px;  /* as wide as the chosen key, not the longest option */
+}
+.key-chip.taken { border-color: var(--down); color: var(--down); background: #ffe3dc; }
+.key-chip.taken select { color: var(--down); }
+.tagline { font-size: 11px; font-weight: 800; letter-spacing: 2.4px; color: var(--wood); white-space: nowrap; }
 .tagline b { color: #d7650f; font-weight: 800; }
 
 .chip {

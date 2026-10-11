@@ -3,6 +3,14 @@
 All notable changes to EXPERT are listed here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] - 2026-10-11
+
+### Added
+- **Global show/hide key** (default **F11**, changeable from the keyboard chip; "off" disables
+  it). Works while the game has focus, never steals focus when showing EXPERT, and the timer keeps
+  running while hidden - the summary pops back up at the end. A key already taken by Windows or
+  another program is flagged in red. F12 isn't offered: Windows reserves it for the debugger.
+
 ## [1.2.0] - 2026-10-11
 
 ### Added
@@ -77,6 +85,7 @@ First public release.
 - Custom end sound via `sounds/done.wav`.
 - `setup.bat` installer with desktop shortcut, and `run.bat`.
 
+[1.3.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.3.0
 [1.2.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.2.0
 [1.1.1]: https://github.com/oryanzz/EXPERT/releases/tag/v1.1.1
 [1.1.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.1.0

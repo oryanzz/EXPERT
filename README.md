@@ -107,6 +107,10 @@ Tips:
   timer, EXP/min and one button - made for full screen. It switches on by itself when a timer
   starts while the game is full screen on the same monitor; the expand button brings the full
   window back.
+- **Show/hide key: F11** (pick another in the keyboard chip at the top). It works from inside the
+  game, doesn't take focus away from it, and the timer keeps running while EXPERT is hidden - the
+  summary pops back up when it ends. EXPERT captures the key, so the game won't get it; choose
+  another one if you use it in-game. F12 can't be used: Windows reserves it for debuggers.
 - Drag the window by its orange title bar. The pin button keeps it above other windows.
 - If a number or the map name was misread, use **Manual fix** (`תיקון ידני`) in the summary.
   A corrected map name is remembered, so the same map is always written the same way.
