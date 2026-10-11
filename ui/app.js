@@ -254,6 +254,17 @@ function showMap(name) {
   $("mapNote").title = name || "";
 }
 
+// the window hugs its content: report the height whenever it changes (phase, history, edit form)
+let lastFit = 0;
+function fitWindow() {
+  const scroll = document.querySelector(".scroll");
+  const pad = parseFloat(getComputedStyle(scroll).paddingTop) + parseFloat(getComputedStyle(scroll).paddingBottom);
+  const total = document.querySelector(".titlebar").offsetHeight + $("content").offsetHeight + pad + 4;  // + body border
+  if (Math.abs(total - lastFit) < 2) return;
+  lastFit = total;
+  api.fit_height(total, window.devicePixelRatio || 1);
+}
+
 window.addEventListener("pywebviewready", () => {
   api = window.pywebview.api;
   setMinutes(store.get("minutes", "10"));
@@ -264,4 +275,5 @@ window.addEventListener("pywebviewready", () => {
   loadHistory();
   tick();
   setInterval(tick, 400);
+  new ResizeObserver(fitWindow).observe($("content"));
 });

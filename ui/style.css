@@ -39,7 +39,7 @@ body {
 }
 .scroll {
   flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
-  padding: 12px 3px 20px;  /* + the ~9px gutter reserved on each side = 12px visual margin */
+  padding: 12px 3px 14px;  /* + the ~9px gutter reserved on each side = 12px visual margin */
   scrollbar-gutter: stable both-edges;  /* no layout jump, and equal side margins, when a scrollbar appears */
 }
 input { -webkit-user-select: text; user-select: text; }
@@ -339,7 +339,9 @@ main { display: flex; flex-direction: column; gap: 18px; }
 .lvl-pill.zero { background: #c9b393; }
 .empty { text-align: center; color: var(--muted); font-weight: 700; font-size: 13px; padding: 18px 12px; margin: 0; }
 
-.credit { margin-top: 16px; text-align: center; font-size: 12px; font-weight: 700; color: var(--muted); }
+.credit { display: flex; justify-content: center; align-items: baseline; gap: 7px; margin-top: 16px;
+          font-size: 12px; font-weight: 700; color: var(--muted); }
+.credit .sep { color: #c9a77a; }
 .credit b { color: var(--wood-dark); letter-spacing: .5px; }
 .credit a { color: #b9560a; font-weight: 800; }
 

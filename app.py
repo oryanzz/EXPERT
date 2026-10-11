@@ -18,6 +18,7 @@ make_dpi_aware()  # must happen before any window exists
 
 import webview  # noqa: E402
 
+from maple_exp.layout import fitted_height  # noqa: E402
 from maple_exp.history import append_session, known_maps, load_recent, replace_last  # noqa: E402
 from maple_exp.minimap import MapVotes, canonical_name  # noqa: E402
 from maple_exp.ocr import BarReader, crop_for_display  # noqa: E402
@@ -326,6 +327,19 @@ class Api:
         if hwnd:
             user32.SetWindowPos(hwnd, HWND_TOPMOST if flag else HWND_NOTOPMOST, 0, 0, 0, 0, SWP_ASYNC_NOMOVE)
 
+    def fit_height(self, content_css, dpr=1.0) -> None:
+        """Resize the window to hug its content (the UI reports its height on every change)."""
+        hwnd = own_window()
+        if not hwnd:
+            return
+        r = wt.RECT()
+        user32.GetWindowRect(hwnd, ctypes.byref(r))
+        work = monitor_work_area(hwnd)
+        max_px = (work.bottom - r.top - 8) if work else (r.bottom - r.top)
+        h = fitted_height(float(content_css), float(dpr or 1), max_px)
+        if abs(h - (r.bottom - r.top)) > 1:
+            user32.SetWindowPos(hwnd, None, 0, 0, r.right - r.left, h, SWP_ASYNC_RESIZE)
+
     def minimize(self) -> None:
         hwnd = own_window()
         if hwnd:
@@ -357,6 +371,7 @@ user32.ShowWindowAsync.argtypes = [wt.HWND, ctypes.c_int]
 user32.PostMessageW.argtypes = [wt.HWND, wt.UINT, wt.WPARAM, wt.LPARAM]
 HWND_TOPMOST, HWND_NOTOPMOST = -1, -2
 SWP_ASYNC_NOMOVE = 0x0001 | 0x0002 | 0x0010 | 0x4000  # NOSIZE | NOMOVE | NOACTIVATE | ASYNCWINDOWPOS
+SWP_ASYNC_RESIZE = 0x0002 | 0x0004 | 0x0010 | 0x4000  # NOMOVE | NOZORDER | NOACTIVATE | ASYNCWINDOWPOS
 SW_MINIMIZE, SW_RESTORE = 6, 9
 WM_CLOSE = 0x0010
 WINDOW_TITLE = "EXPERT"
@@ -375,6 +390,23 @@ def own_window() -> int | None:
         if owner.value == pid:
             return hwnd
     return None
+
+
+class MONITORINFO(ctypes.Structure):
+    _fields_ = [("cbSize", wt.DWORD), ("rcMonitor", wt.RECT), ("rcWork", wt.RECT), ("dwFlags", wt.DWORD)]
+
+
+user32.MonitorFromWindow.argtypes = [wt.HWND, wt.DWORD]
+user32.MonitorFromWindow.restype = wt.HMONITOR
+user32.GetMonitorInfoW.argtypes = [wt.HMONITOR, ctypes.POINTER(MONITORINFO)]
+
+
+def monitor_work_area(hwnd: int) -> wt.RECT | None:
+    """The usable area (minus the taskbar) of the monitor the window is on."""
+    mi = MONITORINFO()
+    mi.cbSize = ctypes.sizeof(MONITORINFO)
+    hmon = user32.MonitorFromWindow(hwnd, 2)  # MONITOR_DEFAULTTONEAREST
+    return mi.rcWork if hmon and user32.GetMonitorInfoW(hmon, ctypes.byref(mi)) else None
 
 
 def round_corners(hwnd: int) -> None:

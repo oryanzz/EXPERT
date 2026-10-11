@@ -3,6 +3,13 @@
 All notable changes to EXPERT are listed here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-10-11
+
+### Changed
+- The window now fits its content: no empty space below the credit line, and the full summary
+  shows without scrolling (capped at the bottom of the screen).
+- The credit line is in English with even spacing: `EXPERT v1.0.1 · by ORYANZ · GitHub`.
+
 ## [1.0.0] - 2026-10-11
 
 First public release.
@@ -20,4 +27,5 @@ First public release.
 - Custom end sound via `sounds/done.wav`.
 - `setup.bat` installer with desktop shortcut, and `run.bat`.
 
+[1.0.1]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.1
 [1.0.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.0
