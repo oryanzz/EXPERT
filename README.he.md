@@ -45,7 +45,7 @@ EXPERT **רק מסתכל על המסך**, בדיוק כמו תוכנת הקלט�
 
 ## התקנה
 
-1. מורידים את הגרסה האחרונה מ-**[Releases](https://github.com/oryancohen/EXPERT/releases)**: לוחצים על `Source code (zip)` ומחלצים את הקבצים.
+1. מורידים את הגרסה האחרונה מ-**[Releases](https://github.com/oryanzz/EXPERT/releases)**: לוחצים על `Source code (zip)` ומחלצים את הקבצים.
 2. לוחצים לחיצה כפולה על **`setup.bat`**. הקובץ מתקין את כל מה שצריך ויוצר קיצור דרך **EXPERT** בשולחן העבודה.
    - אין לך Python? מריצים `winget install Python.Python.3.12`, או מתקינים מ-[python.org](https://www.python.org/downloads/), ומריצים את `setup.bat` שוב.
 3. פותחים את EXPERT מקיצור הדרך בשולחן העבודה, או דרך `run.bat`.
@@ -76,7 +76,7 @@ EXPERT **רק מסתכל על המסך**, בדיוק כמו תוכנת הקלט�
 | "חלון אחר מכסה את בר ה-EXP" | להזיז את החלון שמכסה, או את EXPERT, מהחלק התחתון של המשחק. |
 | הצילום יוצא שחור | להעביר את המשחק ממסך מלא למצב חלון. |
 | המפה לא זוהתה | לפתוח את המיני-מפה במשחק, או לכתוב את המפה בתיקון הידני. |
-| משהו אחר | לבדוק את הקובץ `app.log` בתיקייה של EXPERT, ו[לפתוח דיווח](https://github.com/oryancohen/EXPERT/issues). |
+| משהו אחר | לבדוק את הקובץ `app.log` בתיקייה של EXPERT, ו[לפתוח דיווח](https://github.com/oryanzz/EXPERT/issues). |
 
 ## פרטיות
 

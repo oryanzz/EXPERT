@@ -37,7 +37,7 @@ window and saves a screenshot of every screen to `dev/out/`:
 
 ## Reporting bugs
 
-Open an [issue](https://github.com/oryancohen/EXPERT/issues) with your Windows version, the
+Open an [issue](https://github.com/oryanzz/EXPERT/issues) with your Windows version, the
 game's window size, what you expected and what happened. The last lines of `app.log` help a lot.
 If you attach a screenshot, blur other players' names first.
 

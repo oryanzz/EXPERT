@@ -31,7 +31,7 @@ SHOTS = ROOT / "shots"
 SOUNDS = ROOT / "sounds"
 HISTORY = ROOT / "history.csv"
 WEB_STORAGE = ROOT / ".webview"
-REPO_URL = "https://github.com/oryancohen/EXPERT"
+REPO_URL = "https://github.com/oryanzz/EXPERT"
 SAMPLE_EVERY = 10  # seconds between live readings while the timer runs
 WIN_W, WIN_H = 440, 860
 

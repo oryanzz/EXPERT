@@ -20,4 +20,4 @@ First public release.
 - Custom end sound via `sounds/done.wav`.
 - `setup.bat` installer with desktop shortcut, and `run.bat`.
 
-[1.0.0]: https://github.com/oryancohen/EXPERT/releases/tag/v1.0.0
+[1.0.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.0

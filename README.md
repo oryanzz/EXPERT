@@ -6,7 +6,7 @@
 A free farm timer for **MapleStory Classic** that reads your EXP straight from the screen
 and tells you exactly how much EXP you make per minute, per hour, and how long until your next level.
 
-[![Tests](https://github.com/oryancohen/EXPERT/actions/workflows/tests.yml/badge.svg)](https://github.com/oryancohen/EXPERT/actions/workflows/tests.yml)
+[![Tests](https://github.com/oryanzz/EXPERT/actions/workflows/tests.yml/badge.svg)](https://github.com/oryanzz/EXPERT/actions/workflows/tests.yml)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-blue)
 ![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -55,8 +55,8 @@ game's terms of service - see the [disclaimer](#disclaimer).
 
 ## Install
 
-1. Download the latest version from **[Releases](https://github.com/oryancohen/EXPERT/releases)**
-   (`Source code (zip)`) and extract it, or `git clone https://github.com/oryancohen/EXPERT.git`.
+1. Download the latest version from **[Releases](https://github.com/oryanzz/EXPERT/releases)**
+   (`Source code (zip)`) and extract it, or `git clone https://github.com/oryanzz/EXPERT.git`.
 2. Double-click **`setup.bat`**. It creates a private Python environment, installs the
    dependencies and adds an **EXPERT** shortcut to your desktop.
    - No Python yet? Run `winget install Python.Python.3.12` (or install it from
@@ -93,7 +93,7 @@ for personal use, e.g. with Audacity's *Windows WASAPI* loopback recording.)
 | "Another window is covering the EXP bar" | Move the other window (or EXPERT) off the bottom of the game. |
 | Black screenshot | Switch the game from full screen to windowed mode. |
 | Map not detected | Open the minimap in the game, or type the map in **Manual fix**. |
-| Something else | Check `app.log` in the EXPERT folder and [open an issue](https://github.com/oryancohen/EXPERT/issues). |
+| Something else | Check `app.log` in the EXPERT folder and [open an issue](https://github.com/oryanzz/EXPERT/issues). |
 
 ## Privacy
 
