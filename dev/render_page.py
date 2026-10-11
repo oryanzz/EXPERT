@@ -1,7 +1,7 @@
 """Render a local HTML page in WebView2 and save a screenshot of it (for design previews).
 
-usage: render_page.py page.html out.png [width height]
-Opens at the right edge of the screen, beside the game, so it doesn't cover it.
+usage: render_page.py page.html out.png [width height [x y]]
+Opens at the right edge of the screen (or at x, y - e.g. on another monitor) so it doesn't cover the game.
 """
 import ctypes
 import ctypes.wintypes as wt
@@ -16,6 +16,7 @@ from PIL import ImageGrab  # noqa: E402
 
 page, out = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve()
 W, H = (int(sys.argv[3]), int(sys.argv[4])) if len(sys.argv) > 4 else (572, 1340)
+POS = (int(sys.argv[5]), int(sys.argv[6])) if len(sys.argv) > 6 else None
 user32 = ctypes.windll.user32
 screen_w = user32.GetSystemMetrics(0)
 
@@ -36,6 +37,7 @@ def drive(window):
     os._exit(0)
 
 
-win = webview.create_window("render-preview", str(page), width=W, height=H, x=screen_w - W - 4, y=40,
+x, y = POS or (screen_w - W - 4, 40)
+win = webview.create_window("render-preview", str(page), width=W, height=H, x=x, y=y,
                             frameless=True, on_top=True)
 webview.start(drive, win)

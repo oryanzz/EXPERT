@@ -166,6 +166,8 @@ async function tick() {
   let s;
   try { s = await api.get_state(); } catch { return; }
   renderGame(s.game);
+  renderCompact(s);
+  if (s.phase !== lastPhase && s.phase === "countdown" && s.game.overlay && !compact) setCompact(true, false);
   if (s.phase !== lastPhase) {
     showView(s.phase);
     if (s.phase === "idle" || s.phase === "cancelled") $("timerTitle").textContent = "טיימר פארם";
@@ -181,6 +183,9 @@ async function tick() {
 // ---------- actions ----------
 function setMinutes(m) {
   $("minutes").value = m;
+  const pick = $("cMinutes");
+  if (pick && ![...pick.options].some((o) => +o.value === +m)) pick.add(new Option(`${m} דק'`, m));
+  if (pick) pick.value = String(+m);
   document.querySelectorAll("#presets .tab").forEach((t) => t.classList.toggle("active", +t.dataset.min === +m));
 }
 
@@ -220,7 +225,7 @@ function wire() {
   });
 
   // title-bar buttons sit inside the drag region: don't let a click nudge the window
-  document.querySelectorAll(".tb-btn").forEach((b) => b.addEventListener("mousedown", (e) => e.stopPropagation()));
+  document.querySelectorAll(".tb-btn, .c-btn, .c-dur").forEach((b) => b.addEventListener("mousedown", (e) => e.stopPropagation()));
   $("minBtn").addEventListener("click", () => api.minimize());
   $("closeBtn").addEventListener("click", () => api.close());
 
@@ -271,9 +276,75 @@ function wireUpdate() {
   });
 }
 
+// ---------- compact mode (full-screen play) ----------
+let compact = false;
+let lastCompact = "";
+
+function setCompact(on, remember = true) {
+  if (on === compact) return;
+  compact = on;
+  document.body.classList.toggle("compact-mode", on);
+  if (remember) store.set("compact", on ? "1" : "0");
+  api.compact(on).then(() => {
+    if (on) { lastCompact = ""; fitCompact(); } else { lastFit = 0; fitWindow(); }
+  });
+}
+
+function fitCompact() {
+  if (!compact) return;
+  const w = Math.ceil($("compact").getBoundingClientRect().width) + 4;  // + body border
+  const key = String(w);
+  if (key === lastCompact) return;
+  lastCompact = key;
+  api.fit_compact(w, 50, window.devicePixelRatio || 1);
+}
+
+function shortNum(n) {
+  return n != null && Math.abs(n) >= 10000 ? Math.round(n / 1000) + "K" : num(n);
+}
+
+function renderCompact(s) {
+  const views = { idle: "idle", cancelled: "idle", countdown: "countdown", running: "running",
+                  finalizing: "finalizing", done: "done", error: "error" };
+  const view = views[s.phase] || "idle";
+  document.querySelectorAll(".c-view").forEach((v) => v.classList.toggle("on", v.dataset.phase === view));
+  if (view === "countdown") $("cCount").textContent = Math.max(1, Math.ceil(s.countdown));
+  if (view === "running") {
+    $("cClock").textContent = clock(s.remaining);
+    $("cRate").textContent = s.live && s.live.minutes > 0 ? num(s.live.exp_per_min) : "—";
+  }
+  if (view === "done" && s.result) {
+    $("cDoneRate").textContent = num(s.result.exp_per_min);
+    $("cDoneHour").textContent = shortNum(s.result.exp_per_hour);
+    $("cDoneEta").textContent = s.result.eta_minutes == null ? "—" : etaShort(s.result.eta_minutes);
+  }
+  if (view === "error") $("cError").textContent = s.error || "";
+  $("cStart").disabled = !gameFound;
+  const live = s.live || s.result;
+  $("compact").title = live ? `EXP שנצבר: ${signed(live.exp_gained)}` + (s.map ? ` · ${s.map}` : "") : "";
+}
+
+function wireCompact() {
+  $("compactBtn").addEventListener("click", () => setCompact(true));
+  $("cExpand").addEventListener("click", () => setCompact(false));
+  $("cStart").addEventListener("click", async () => {
+    const minutes = +$("cMinutes").value;
+    setMinutes(minutes);
+    store.set("minutes", minutes);
+    const res = await api.start(minutes, 3);
+    if (!res.ok) { setCompact(false); showTest({ ok: false, error: res.error }); return; }
+    lastPhase = null; tick();
+  });
+  $("cCancel").addEventListener("click", () => api.reset().then(() => { lastPhase = null; tick(); }));
+  $("cStop").addEventListener("click", () => api.stop());
+  $("cAgain").addEventListener("click", () => api.reset().then(() => { lastPhase = null; tick(); }));
+  new ResizeObserver(fitCompact).observe($("compact"));
+}
+
 // the window hugs its content: report the height whenever it changes (phase, history, edit form)
 let lastFit = 0;
 function fitWindow() {
+  if (compact) return;
   const scroll = document.querySelector(".scroll");
   const pad = parseFloat(getComputedStyle(scroll).paddingTop) + parseFloat(getComputedStyle(scroll).paddingBottom);
   const total = document.querySelector(".titlebar").offsetHeight + $("content").offsetHeight + pad + 4;  // + body border
@@ -288,6 +359,8 @@ window.addEventListener("pywebviewready", () => {
   if (store.get("pin", "1") === "0") { $("pinBtn").classList.remove("active"); api.set_on_top(false); }
   wire();
   wireUpdate();
+  wireCompact();
+  if (store.get("compact", "0") === "1") setCompact(true);
   api.app_info().then((i) => { $("appVersion").textContent = "v" + i.version; });
   api.check_update().then(showUpdate);
   $("repoLink").addEventListener("click", (e) => { e.preventDefault(); api.open_repo(); });

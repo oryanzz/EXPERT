@@ -361,6 +361,41 @@ main { display: flex; flex-direction: column; gap: 18px; }
 .credit b { color: var(--wood-dark); letter-spacing: .5px; }
 .credit a { color: #b9560a; font-weight: 800; }
 
+/* --- compact mode (full-screen play) -------------------------------------- */
+.compact { display: none; }
+body.compact-mode .titlebar, body.compact-mode .scroll { display: none; }
+body.compact-mode .compact {
+  display: flex; align-items: center; gap: 8px; width: max-content; height: 100%; padding: 0 8px 0 10px;
+  white-space: nowrap; background: linear-gradient(var(--cream), var(--cream-2)); cursor: grab;
+}
+.c-watch { width: 26px; height: 26px; flex: none; pointer-events: none; filter: drop-shadow(0 1.5px 0 var(--wood-dark)); }
+.c-view { display: none; align-items: center; gap: 8px; }
+.c-view.on { display: inline-flex; }
+.compact .num { font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; }
+.compact small { font-size: 11px; font-weight: 800; color: var(--muted);
+                 direction: rtl; unicode-bidi: isolate; }  /* Hebrew labels inside the LTR strip */
+.compact .sep { width: 2px; height: 22px; background: #e2c48d; }
+.c-btn {
+  display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border-radius: 50%;
+  border: 2px solid var(--wood); color: #fff; box-shadow: 0 2px 0 var(--wood-dark); cursor: pointer; flex: none;
+}
+.c-btn svg { width: 13px; height: 13px; }
+.c-btn.go { background: linear-gradient(#ffc766, #f08a22 60%, #e0701a); }
+.c-btn.stop { background: linear-gradient(#ef6b55, #cf3a2b 60%, #b52a1e); }
+.c-btn.ghost { width: 26px; height: 26px; background: var(--cream-2); color: var(--wood); }
+.c-btn:disabled { filter: grayscale(.8); opacity: .6; cursor: not-allowed; }
+.c-btn:active { transform: translateY(2px); box-shadow: 0 0 0 var(--wood-dark); }
+.c-dur {
+  height: 28px; padding: 0 4px; border: 2px solid #e2c48d; border-radius: 8px; background: #fff;
+  font: 800 13px "Rubik", sans-serif; color: var(--wood); cursor: pointer;
+}
+.c-ok { color: #2e8049; font-weight: 900; font-size: 16px; }
+.c-warn {
+  display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; flex: none;
+  background: var(--down); color: #fff; font-weight: 900; font-size: 13px;
+}
+#cError { max-width: 220px; overflow: hidden; text-overflow: ellipsis; color: var(--down); }
+
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #d8b47a; border-radius: 99px; border: 2px solid var(--cream); }

@@ -3,6 +3,15 @@
 All notable changes to EXPERT are listed here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2026-10-11
+
+### Added
+- **Compact mode for full-screen play**: a small strip (about 200-310 x 50 px) with the timer,
+  live EXP/min, one action button and an expand button, in every state - start, countdown,
+  running and the summary line. Toggle it from the title bar; it turns on by itself when a timer
+  starts while the game is full screen on the same monitor as EXPERT. The strip keeps the
+  window's top-right corner in place and can be dragged anywhere.
+
 ## [1.1.1] - 2026-10-11
 
 ### Fixed
@@ -68,6 +77,7 @@ First public release.
 - Custom end sound via `sounds/done.wav`.
 - `setup.bat` installer with desktop shortcut, and `run.bat`.
 
+[1.2.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.2.0
 [1.1.1]: https://github.com/oryanzz/EXPERT/releases/tag/v1.1.1
 [1.1.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.1.0
 [1.0.3]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.3

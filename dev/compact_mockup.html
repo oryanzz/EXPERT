@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>EXPERT compact - sketch</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&family=Rubik:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --cream:#fff8e7; --cream-2:#fdecc8; --ink:#3b1d06; --muted:#74553a; --wood:#7a3b0c; --wood-dark:#4a2306;
+          --bar: linear-gradient(#fbff9a, #d9ea3c 45%, #9fcf22); --orange: linear-gradient(#ffb44d, #e8741c 60%, #d7650f); }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 18px; width: 1180px; font-family: "Rubik", "Nunito", sans-serif; color: var(--ink);
+         background: linear-gradient(#6ec6ff, #d9f1ff 70%, #eaf8d8); }
+  h1 { margin: 0 0 4px; font: 700 24px "Fredoka", "Rubik", sans-serif; color: var(--wood-dark); }
+  .lead { margin: 0 0 14px; font-weight: 700; color: var(--muted); }
+  .variant { display: grid; grid-template-columns: 560px 1fr; gap: 16px; background: var(--cream);
+             border: 3px solid var(--wood); border-radius: 14px; box-shadow: 0 4px 0 var(--wood-dark);
+             padding: 12px; margin-bottom: 16px; }
+  .vhead { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 10px; border-bottom: 2px dashed #e2c48d; padding-bottom: 8px; }
+  .vhead b { font: 700 20px "Fredoka", sans-serif; color: var(--wood-dark); }
+  .vhead span { font-weight: 700; color: var(--muted); font-size: 14px; }
+  .vhead .size { margin-inline-start: auto; direction: ltr; font: 800 13px "Nunito"; color: #2e8049; background: #e3f3e7;
+                 border: 2px solid #2e8049; border-radius: 8px; padding: 1px 8px; }
+  /* game context: a full-screen corner */
+  .scene { position: relative; height: 300px; border-radius: 10px; overflow: hidden; border: 3px solid var(--wood-dark);
+           background: url("marketing/scene_blurred.jpg") right top / 1920px auto no-repeat; }  /* 1:1 with the widgets */
+  .scene .ghost { position: absolute; top: 10px; right: 10px; width: 424px; height: 760px; border: 2px dashed rgba(255,255,255,.9);
+                  border-radius: 8px; background: rgba(255,255,255,.12); }
+  .scene .ghost span { position: absolute; top: 230px; right: 0; left: 0; text-align: center; font-size: 11px; font-weight: 800; color: #fff;
+                       text-shadow: 0 1px 2px #000; }
+  .scene .place { position: absolute; top: 10px; right: 10px; width: max-content; }
+  .scene.top .place { right: 50%; transform: translateX(50%); }
+  .states { display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+  .state { display: flex; align-items: center; gap: 12px; }
+  .state > i { width: 64px; flex: none; font-style: normal; font-size: 12px; font-weight: 800; color: var(--muted); }
+
+  .watch { width: 26px; height: 26px; flex: none; filter: drop-shadow(0 1.5px 0 var(--wood-dark)); }
+  .num { font-family: "Fredoka", sans-serif; font-weight: 700; direction: ltr; font-variant-numeric: tabular-nums; }
+  .btn { display: grid; place-items: center; border: 2px solid var(--wood); color: #fff; font: 700 13px "Fredoka";
+         text-shadow: 0 1px 0 var(--wood-dark); box-shadow: 0 2px 0 var(--wood-dark); }
+  .go { background: var(--orange); }
+  .stop { background: linear-gradient(#ef6b55, #b52a1e); }
+  .ghostbtn { background: var(--cream-2); color: var(--wood); text-shadow: none; }
+  .ic { width: 24px; height: 24px; border-radius: 50%; }
+  .ic svg { width: 11px; height: 11px; }
+
+  /* A: pill */
+  .pill { display: inline-flex; align-items: center; gap: 8px; height: 46px; padding: 0 8px 0 12px; border-radius: 999px;
+          background: linear-gradient(var(--cream), var(--cream-2)); border: 3px solid var(--wood); box-shadow: 0 3px 0 var(--wood-dark); }
+  .pill .sep { width: 2px; height: 22px; background: #e2c48d; }
+  .pill .num { font-size: 20px; }
+  .pill small { font-size: 11px; font-weight: 800; color: var(--muted); }
+  .pill .dur { font: 800 13px "Rubik"; color: var(--wood); background: #fff; border: 2px solid #e2c48d; border-radius: 8px; padding: 1px 7px; }
+  .pill .go, .pill .stop { width: 30px; height: 30px; border-radius: 50%; }
+  .pill .ring { position: relative; width: 30px; height: 30px; }
+  .pill .done-t { font: 800 13px "Rubik"; color: #2e8049; }
+
+  /* B: mini card */
+  .card { width: 240px; border-radius: 12px; overflow: hidden; background: var(--cream); border: 3px solid var(--wood);
+          box-shadow: 0 4px 0 var(--wood-dark); }
+  .card .t { display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 6px 0 8px; background: var(--orange);
+             border-bottom: 2px solid var(--wood); }
+  .card .t .watch { width: 20px; height: 20px; }
+  .card .t b { font: 700 15px "Fredoka"; color: #fff3cf; -webkit-text-stroke: 3px var(--wood-dark); paint-order: stroke fill; direction: ltr; }
+  .card .t .sp { flex: 1; }
+  .card .t .ic { width: 20px; height: 20px; }
+  .card .bd { padding: 8px 10px 10px; }
+  .card .clock { text-align: center; font-size: 34px; line-height: 1; }
+  .card .xp { height: 10px; margin: 6px 0 8px; background: #3a2410; border: 2px solid var(--wood-dark); border-radius: 6px; overflow: hidden; }
+  .card .xp i { display: block; height: 100%; width: 23%; background: var(--bar); }
+  .card .row { display: flex; gap: 6px; }
+  .card .row div { flex: 1; text-align: center; background: var(--cream-2); border: 2px solid #e2c48d; border-radius: 8px; padding: 3px 0; }
+  .card .row small { display: block; font-size: 10px; font-weight: 800; color: var(--muted); }
+  .card .row .num { font-size: 15px; }
+  .card .wide { height: 30px; margin-top: 8px; border-radius: 8px; width: 100%; font-size: 14px; }
+  .card .durs { display: flex; gap: 4px; margin-bottom: 8px; }
+  .card .durs span { flex: 1; text-align: center; font: 700 12px "Fredoka"; padding: 3px 0; border: 2px solid var(--wood);
+                     border-radius: 7px; background: var(--cream-2); color: var(--wood); }
+  .card .durs span.on { background: var(--orange); color: #fff; text-shadow: 0 1px 0 var(--wood-dark); }
+  .card .map { font-size: 11px; font-weight: 800; color: var(--muted); text-align: center; margin-bottom: 6px; direction: ltr; }
+
+  /* C: HUD bar (top centre, like the game's own UI) */
+  .hud { white-space: nowrap; display: inline-flex; align-items: center; gap: 10px; height: 36px; padding: 0 6px 0 10px; border-radius: 9px;
+         background: linear-gradient(#5b3a1c, #3a2410); border: 2px solid #c98a2a; box-shadow: 0 2px 0 #1e1006, inset 0 1px 0 rgba(255,220,150,.35);
+         color: #fff3cf; }
+  .hud .watch { width: 22px; height: 22px; }
+  .hud .num { font-size: 17px; color: #fff; }
+  .hud small { font-size: 10px; font-weight: 800; color: #e9c98f; }
+  .hud .mini { width: 70px; height: 8px; border-radius: 4px; background: #1e1006; border: 1px solid #c98a2a; overflow: hidden; }
+  .hud .mini i { display: block; height: 100%; width: 23%; background: var(--bar); }
+  .hud .sep { width: 1px; height: 20px; background: #8a5a2a; }
+  .hud .stop, .hud .go { width: 24px; height: 24px; border-radius: 6px; }
+  .hud .ok { color: #a8e06a; font-weight: 800; font-size: 13px; }
+
+  .note { margin-top: 2px; font-size: 13px; font-weight: 700; color: var(--muted); line-height: 1.5; }
+  .note b { color: var(--wood-dark); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="g-arc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbff9a"/><stop offset=".5" stop-color="#d9ea3c"/><stop offset="1" stop-color="#8cc21c"/></linearGradient>
+    <symbol id="watch" viewBox="0 0 64 64">
+      <rect x="25" y="2.5" width="14" height="8" rx="3" fill="#f58a1f" stroke="#4a2306" stroke-width="3.5"/>
+      <rect x="29" y="9" width="6" height="6" fill="#4a2306"/>
+      <rect x="46" y="11" width="9" height="7" rx="2.5" transform="rotate(45 50.5 14.5)" fill="#f58a1f" stroke="#4a2306" stroke-width="3.5"/>
+      <circle cx="32" cy="37" r="24" fill="#ffd34d" stroke="#4a2306" stroke-width="4.5"/>
+      <circle cx="32" cy="37" r="18.5" fill="#fff8e1" stroke="#c98a2a" stroke-width="1.5"/>
+      <circle cx="32" cy="37" r="13" fill="none" stroke="#4a2306" stroke-width="8.5" stroke-dasharray="57.2 100" transform="rotate(-90 32 37)" stroke-linecap="round"/>
+      <circle cx="32" cy="37" r="13" fill="none" stroke="url(#g-arc)" stroke-width="5" stroke-dasharray="57.2 100" transform="rotate(-90 32 37)" stroke-linecap="round"/>
+      <path d="M32 37 L21.6 44.6" stroke="#4a2306" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="32" cy="37" r="3.6" fill="#4a2306"/>
+    </symbol>
+    <symbol id="play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></symbol>
+    <symbol id="stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></symbol>
+    <symbol id="expand" viewBox="0 0 24 24"><path d="M4 10V4h6M20 14v6h-6M4 4l6 6M20 20l-6-6" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<h1>EXPERT · מצב קומפקטי למסך מלא (סקיצה)</h1>
+<p class="lead">הכל בקנה מידה 1:1. המסגרת המקווקוות היא החלון הנוכחי (424×760), שמכסה כמעט את כל הפינה. כל כיוון מוצג בשלושה מצבים.</p>
+
+<!-- A -->
+<section class="variant">
+  <div class="vhead"><b>A · כדור</b><span>הכי קטן. רק השעון, הקצב וכפתור אחד.</span><span class="size">250×46 · ~4% מהחלון הנוכחי</span></div>
+  <div class="scene"><div class="ghost"><span>החלון הנוכחי</span></div>
+    <div class="place"><div class="pill"><svg class="watch"><use href="#watch"/></svg><span class="num">07:42</span><span class="sep"></span><span class="num">351</span><small>/דק'</small><span class="btn stop"><svg width="12" height="12"><use href="#stop"/></svg></span></div></div>
+  </div>
+  <div class="states">
+    <div class="state"><i>לפני</i><div class="pill"><svg class="watch"><use href="#watch"/></svg><span class="dur">10 דק' ▾</span><span class="btn go"><svg width="13" height="13"><use href="#play"/></svg></span><span class="btn ghostbtn ic"><svg><use href="#expand"/></svg></span></div></div>
+    <div class="state"><i>בזמן</i><div class="pill"><svg class="watch"><use href="#watch"/></svg><span class="num">07:42</span><span class="sep"></span><span class="num">351</span><small>/דק'</small><span class="btn stop"><svg width="12" height="12"><use href="#stop"/></svg></span></div></div>
+    <div class="state"><i>סיכום</i><div class="pill"><span class="done-t">✓</span><span class="num">351</span><small>/דק'</small><span class="sep"></span><span class="num">21K</span><small>/שעה</small><span class="sep"></span><span class="num">50</span><small>דק' לרמה</small><span class="btn ghostbtn ic"><svg><use href="#expand"/></svg></span></div></div>
+    <p class="note">ריחוף עם העכבר מציג עוד פרטים. כפתור ההרחבה פותח את החלון המלא.</p>
+  </div>
+</section>
+
+<!-- B -->
+<section class="variant">
+  <div class="vhead"><b>B · כרטיס קטן</b><span>כל הנתונים החשובים, עדיין קטן.</span><span class="size">240×150 · ~11% מהחלון הנוכחי</span></div>
+  <div class="scene"><div class="ghost"><span>החלון הנוכחי</span></div>
+    <div class="place"><div class="card"><div class="t"><svg class="watch"><use href="#watch"/></svg><b>EXPERT</b><span class="sp"></span><span class="btn ghostbtn ic"><svg><use href="#expand"/></svg></span></div>
+      <div class="bd"><div class="clock num">07:42</div><div class="xp"><i></i></div>
+        <div class="row"><div><small>EXP לדקה</small><span class="num">351</span></div><div><small>לרמה הבאה</small><span class="num">50 דק'</span></div></div></div></div></div>
+  </div>
+  <div class="states" style="flex-direction:row; flex-wrap:wrap; align-items:flex-start; gap:12px">
+    <div class="card"><div class="t"><svg class="watch"><use href="#watch"/></svg><b>EXPERT</b><span class="sp"></span><span class="btn ghostbtn ic"><svg><use href="#expand"/></svg></span></div>
+      <div class="bd"><div class="map">East Rocky Mountain III</div><div class="durs"><span>5</span><span class="on">10</span><span>15</span><span>30</span><span>60</span></div><span class="btn go wide">▶ התחל</span></div></div>
+    <div class="card"><div class="t"><svg class="watch"><use href="#watch"/></svg><b>EXPERT</b><span class="sp"></span><span class="btn ghostbtn ic"><svg><use href="#expand"/></svg></span></div>
+      <div class="bd"><div class="clock num">07:42</div><div class="xp"><i></i></div>
+        <div class="row"><div><small>EXP לדקה</small><span class="num">351</span></div><div><small>לרמה הבאה</small><span class="num">50 דק'</span></div></div>
+        <span class="btn stop wide">■ עצור</span></div></div>
+    <div class="card"><div class="t"><svg class="watch"><use href="#watch"/></svg><b>EXPERT</b><span class="sp"></span><span class="btn ghostbtn ic"><svg><use href="#expand"/></svg></span></div>
+      <div class="bd"><div class="row" style="margin-bottom:6px"><div><small>EXP לדקה</small><span class="num">351</span></div><div><small>EXP לשעה</small><span class="num">21,044</span></div></div>
+        <div class="row"><div><small>לרמה הבאה</small><span class="num">50 דק'</span></div></div>
+        <span class="btn go wide">טיימר חדש</span></div></div>
+  </div>
+</section>
+
+<!-- C -->
+<section class="variant">
+  <div class="vhead"><b>C · פס HUD</b><span>פס דק במרכז העליון, בסגנון ה-UI של המשחק.</span><span class="size">420×36 · ~5% מהחלון הנוכחי</span></div>
+  <div class="scene top">
+    <div class="place"><div class="hud"><svg class="watch"><use href="#watch"/></svg><span class="num">07:42</span><span class="mini"><i></i></span><span class="sep"></span><small>EXP/דק'</small><span class="num">351</span><span class="sep"></span><small>לרמה</small><span class="num">50 דק'</span><span class="btn stop"><svg width="11" height="11"><use href="#stop"/></svg></span></div></div>
+  </div>
+  <div class="states">
+    <div class="state"><i>לפני</i><div class="hud"><svg class="watch"><use href="#watch"/></svg><small>East Rocky Mountain III</small><span class="sep"></span><span class="num">10</span><small>דק'</small><span class="btn go"><svg width="12" height="12"><use href="#play"/></svg></span><span class="btn ghostbtn ic" style="border-radius:6px"><svg><use href="#expand"/></svg></span></div></div>
+    <div class="state"><i>בזמן</i><div class="hud"><svg class="watch"><use href="#watch"/></svg><span class="num">07:42</span><span class="mini"><i></i></span><span class="sep"></span><small>EXP/דק'</small><span class="num">351</span><span class="sep"></span><small>לרמה</small><span class="num">50 דק'</span><span class="btn stop"><svg width="11" height="11"><use href="#stop"/></svg></span></div></div>
+    <div class="state"><i>סיכום</i><div class="hud"><span class="ok">✓ סיכום</span><span class="sep"></span><span class="num">351</span><small>/דק'</small><span class="sep"></span><span class="num">21,044</span><small>/שעה</small><span class="sep"></span><span class="num">50 דק'</span><small>לרמה</small><span class="btn ghostbtn ic" style="border-radius:6px"><svg><use href="#expand"/></svg></span></div></div>
+    <p class="note">נראה כמו חלק מהמשחק. יושב למעלה במרכז, רחוק מבר ה-EXP ומהמיני-מפה.</p>
+  </div>
+</section>
+</body>
+</html>

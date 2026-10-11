@@ -36,3 +36,23 @@ def test_full_screen_game_moves_expert_to_the_other_monitor():
 def test_full_screen_game_on_a_single_monitor_uses_the_top_right_corner():
     game = (0, 0, 2560, 1440)
     assert dock_position(game, [PRIMARY], win_w=424) == (2560 - 424 - 16, 16)
+
+
+from maple_exp.layout import compact_rect, covers_monitor  # noqa: E402
+
+
+def test_compact_keeps_the_top_right_corner_in_place():
+    # full window at (2104, 16)-(2528, 776) shrinks to a 260x52 strip at the same top-right corner
+    assert compact_rect((2104, 16, 2528, 776), 260, 52) == (2268, 16, 260, 52)
+
+
+def test_growing_back_also_keeps_the_top_right_corner():
+    assert compact_rect((2268, 16, 2528, 68), 424, 760) == (2104, 16, 424, 760)
+
+
+def test_full_screen_game_covers_its_monitor():
+    assert covers_monitor((0, 0, 2560, 1440), (0, 0, 2560, 1440))
+
+
+def test_windowed_game_does_not_cover_its_monitor():
+    assert not covers_monitor((86, 109, 2006, 1309), (0, 0, 2560, 1440))

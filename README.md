@@ -103,6 +103,10 @@ Tips:
 - **Full screen works.** EXPERT opens on your second monitor if you have one, otherwise in the
   top-right corner. Press Start, click back into the game within 3 seconds, and the chime tells
   you when the summary is ready.
+- **Compact mode** (the shrink button in the title bar) turns EXPERT into a small strip with the
+  timer, EXP/min and one button - made for full screen. It switches on by itself when a timer
+  starts while the game is full screen on the same monitor; the expand button brings the full
+  window back.
 - Drag the window by its orange title bar. The pin button keeps it above other windows.
 - If a number or the map name was misread, use **Manual fix** (`תיקון ידני`) in the summary.
   A corrected map name is remembered, so the same map is always written the same way.

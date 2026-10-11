@@ -21,7 +21,7 @@ make_dpi_aware()  # must happen before any window exists
 
 import webview  # noqa: E402
 
-from maple_exp.layout import dock_position, fitted_height  # noqa: E402
+from maple_exp.layout import compact_rect, covers_monitor, dock_position, fitted_height  # noqa: E402
 from maple_exp.update import check_for_update  # noqa: E402
 from maple_exp.history import append_session, known_maps, load_recent, replace_last  # noqa: E402
 from maple_exp.minimap import MapVotes, canonical_name  # noqa: E402
@@ -44,6 +44,7 @@ ICON = RES / "ui" / "icon.ico"
 APP_ID = "ORYANZ.EXPERT"  # taskbar identity; scripts/make_shortcut.ps1 stamps the same ID on the shortcut
 SAMPLE_EVERY = 10  # seconds between live readings while the timer runs
 WIN_W, WIN_H = 440, 860
+MIN_W, MIN_H = 160, 40  # small enough for the compact strip
 
 ERRORS = {
     "not_found": "MapleStory לא פתוח",
@@ -269,13 +270,15 @@ class Api:
         self._reader = BarReader()
         self._session: Session | None = None
         self._update: dict | None = None  # latest release found by check_update()
+        self._full_width = 0  # the full window's width, kept while in compact mode
         threading.Thread(target=self._reader.warm_up, daemon=True).start()
 
     def get_state(self) -> dict:
         hwnd = find_game()
         rect = game_rect(hwnd) if hwnd else None
         game = {"found": bool(hwnd), "minimized": bool(hwnd) and rect is None,
-                "size": f"{rect[2] - rect[0]}×{rect[3] - rect[1]}" if rect else None}
+                "size": f"{rect[2] - rect[0]}×{rect[3] - rect[1]}" if rect else None,
+                "overlay": bool(rect) and game_covers_our_screen(hwnd, rect)}
         session = self._session.state() if self._session else {"phase": "idle"}
         return {"game": game, **session}
 
@@ -377,8 +380,40 @@ class Api:
         work = monitor_work_area(hwnd)
         max_px = (work.bottom - r.top - 8) if work else (r.bottom - r.top)
         h = fitted_height(float(content_css), float(dpr or 1), max_px)
-        if abs(h - (r.bottom - r.top)) > 1:
-            user32.SetWindowPos(hwnd, None, 0, 0, r.right - r.left, h, SWP_ASYNC_RESIZE)
+        # leaving compact mode queues a width change first; use the remembered width so this
+        # height fit (queued right after it) can't narrow the window back
+        x, y, w, h = compact_rect((r.left, r.top, r.right, r.bottom), self._full_width or (r.right - r.left), h)
+        if (w, h) != (r.right - r.left, r.bottom - r.top):
+            user32.SetWindowPos(hwnd, None, x, y, w, h, SWP_ASYNC_MOVE_RESIZE)
+
+    def compact(self, on) -> None:
+        """Enter/leave compact mode. Remembers the full window's width to restore it."""
+        hwnd = own_window()
+        if not hwnd:
+            return
+        r = wt.RECT()
+        user32.GetWindowRect(hwnd, ctypes.byref(r))
+        if on:
+            self._full_width = self._full_width or (r.right - r.left)
+        else:
+            x, y, w, h = compact_rect((r.left, r.top, r.right, r.bottom),
+                                      self._full_width or (r.right - r.left), r.bottom - r.top)
+            user32.SetWindowPos(hwnd, None, x, y, w, h, SWP_ASYNC_MOVE_RESIZE)
+
+    def fit_compact(self, css_w, css_h, dpr=1.0) -> None:
+        """Size the window to the compact strip, top-right corner fixed."""
+        hwnd = own_window()
+        if not hwnd:
+            return
+        r = wt.RECT()
+        user32.GetWindowRect(hwnd, ctypes.byref(r))
+        scale = float(dpr or 1)
+        # never ask for less than the window's minimum size: Windows would widen it to the minimum
+        # and the right edge (which compact_rect keeps fixed) would drift
+        w_px, h_px = max(round(css_w * scale), round(MIN_W * scale)), max(round(css_h * scale), round(MIN_H * scale))
+        x, y, w, h = compact_rect((r.left, r.top, r.right, r.bottom), w_px, h_px)
+        if (w, h) != (r.right - r.left, r.bottom - r.top):
+            user32.SetWindowPos(hwnd, None, x, y, w, h, SWP_ASYNC_MOVE_RESIZE)
 
     def minimize(self) -> None:
         hwnd = own_window()
@@ -411,7 +446,7 @@ user32.ShowWindowAsync.argtypes = [wt.HWND, ctypes.c_int]
 user32.PostMessageW.argtypes = [wt.HWND, wt.UINT, wt.WPARAM, wt.LPARAM]
 HWND_TOPMOST, HWND_NOTOPMOST = -1, -2
 SWP_ASYNC_NOMOVE = 0x0001 | 0x0002 | 0x0010 | 0x4000  # NOSIZE | NOMOVE | NOACTIVATE | ASYNCWINDOWPOS
-SWP_ASYNC_RESIZE = 0x0002 | 0x0004 | 0x0010 | 0x4000  # NOMOVE | NOZORDER | NOACTIVATE | ASYNCWINDOWPOS
+SWP_ASYNC_MOVE_RESIZE = 0x0004 | 0x0010 | 0x4000  # NOZORDER | NOACTIVATE | ASYNCWINDOWPOS
 SW_MINIMIZE, SW_RESTORE = 6, 9
 WM_CLOSE = 0x0010
 WINDOW_TITLE = "EXPERT"
@@ -450,6 +485,22 @@ def monitor_work_area(hwnd: int) -> wt.RECT | None:
     return mi.rcWork if hmon and user32.GetMonitorInfoW(hmon, ctypes.byref(mi)) else None
 
 
+def game_covers_our_screen(game_hwnd: int, client: tuple) -> bool:
+    """The game is full screen on the same monitor as EXPERT, so EXPERT sits on top of it."""
+    mine = own_window()
+    if not mine:
+        return False
+    game_mon = user32.MonitorFromWindow(game_hwnd, 2)
+    if game_mon != user32.MonitorFromWindow(mine, 2):
+        return False
+    mi = MONITORINFO()
+    mi.cbSize = ctypes.sizeof(MONITORINFO)
+    if not user32.GetMonitorInfoW(game_mon, ctypes.byref(mi)):
+        return False
+    m = mi.rcMonitor
+    return covers_monitor(client, (m.left, m.top, m.right, m.bottom))
+
+
 def round_corners(hwnd: int) -> None:
     """Windows 11 rounded corners + a wood-colored native border for the frameless window.
     Older Windows ignores these attributes and keeps square corners."""
@@ -465,7 +516,7 @@ def create_main_window(api: "Api"):
     window = webview.create_window(
         WINDOW_TITLE, str(RES / "ui" / "index.html"), js_api=api,
         width=WIN_W, height=WIN_H, x=x, y=y,
-        frameless=True, easy_drag=False, on_top=True, background_color="#9fd8ff",
+        frameless=True, easy_drag=False, on_top=True, background_color="#9fd8ff", min_size=(MIN_W, MIN_H),
     )
     window.events.shown += lambda: round_corners(own_window())
     return window

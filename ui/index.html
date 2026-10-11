@@ -10,6 +10,22 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="g-arc-c" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbff9a"/><stop offset=".5" stop-color="#d9ea3c"/><stop offset="1" stop-color="#8cc21c"/></linearGradient>
+    <symbol id="watchSym" viewBox="0 0 64 64">
+      <rect x="25" y="2.5" width="14" height="8" rx="3" fill="#f58a1f" stroke="#4a2306" stroke-width="3.5"/>
+      <rect x="29" y="9" width="6" height="6" fill="#4a2306"/>
+      <rect x="46" y="11" width="9" height="7" rx="2.5" transform="rotate(45 50.5 14.5)" fill="#f58a1f" stroke="#4a2306" stroke-width="3.5"/>
+      <circle cx="32" cy="37" r="24" fill="#ffd34d" stroke="#4a2306" stroke-width="4.5"/>
+      <circle cx="32" cy="37" r="18.5" fill="#fff8e1" stroke="#c98a2a" stroke-width="1.5"/>
+      <circle cx="32" cy="37" r="13" fill="none" stroke="#4a2306" stroke-width="8.5" stroke-dasharray="57.2 100" transform="rotate(-90 32 37)" stroke-linecap="round"/>
+      <circle cx="32" cy="37" r="13" fill="none" stroke="url(#g-arc-c)" stroke-width="5" stroke-dasharray="57.2 100" transform="rotate(-90 32 37)" stroke-linecap="round"/>
+      <path d="M32 37 L21.6 44.6" stroke="#4a2306" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="32" cy="37" r="3.6" fill="#4a2306"/>
+    </symbol>
+  </defs>
+</svg>
 <!-- frameless window: this bar replaces the Windows title bar; dragging it moves the window -->
 <header class="titlebar pywebview-drag-region">
   <div class="brand" dir="ltr" aria-label="EXPERT">
@@ -32,6 +48,9 @@
     <button class="tb-btn active" id="pinBtn" title="תמיד מעל שאר החלונות" aria-label="תמיד מעל" aria-pressed="true">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3l6 6-3 1-4 4 1 5-2 2-4-5-5 5-1-1 5-5-5-4 2-2 5 1 4-4z" fill="currentColor"/></svg>
     </button>
+    <button class="tb-btn" id="compactBtn" title="מצב קומפקטי" aria-label="מצב קומפקטי">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4v6H4M14 20v-6h6M10 10L4 4M14 14l6 6" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+    </button>
     <button class="tb-btn" id="minBtn" title="מזער" aria-label="מזער">
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="3" rx="1.5" fill="currentColor"/></svg>
     </button>
@@ -40,6 +59,35 @@
     </button>
   </div>
 </header>
+
+<!-- compact mode: one small strip for full-screen play; the whole strip drags the window -->
+<div class="compact pywebview-drag-region" id="compact" dir="ltr">
+  <svg class="c-watch" viewBox="0 0 64 64" aria-hidden="true"><use href="#watchSym"/></svg>
+  <span class="c-view" data-phase="idle">
+    <select class="c-dur" id="cMinutes" title="כמה דקות">
+      <option value="5">5 דק'</option><option value="10">10 דק'</option><option value="15">15 דק'</option>
+      <option value="30">30 דק'</option><option value="60">שעה</option>
+    </select>
+    <button class="c-btn go" id="cStart" title="התחל טיימר" aria-label="התחל טיימר"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button>
+  </span>
+  <span class="c-view" data-phase="countdown">
+    <b class="num" id="cCount">3</b><small>חזור למשחק…</small>
+    <button class="c-btn stop" id="cCancel" title="ביטול" aria-label="ביטול"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg></button>
+  </span>
+  <span class="c-view" data-phase="running">
+    <b class="num" id="cClock">0:00</b><i class="sep"></i><b class="num" id="cRate">—</b><small>/דק'</small>
+    <button class="c-btn stop" id="cStop" title="עצור וסכם" aria-label="עצור וסכם"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg></button>
+  </span>
+  <span class="c-view" data-phase="finalizing"><small>מסכם…</small></span>
+  <span class="c-view" data-phase="done">
+    <span class="c-ok">✓</span><b class="num" id="cDoneRate"></b><small>/דק'</small><i class="sep"></i>
+    <b class="num" id="cDoneHour"></b><small>/שעה</small><i class="sep"></i>
+    <b class="num" id="cDoneEta"></b><small>לרמה</small>
+    <button class="c-btn ghost" id="cAgain" title="טיימר חדש" aria-label="טיימר חדש"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.05-4.95M19 4v4h-4" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </span>
+  <span class="c-view" data-phase="error"><span class="c-warn">!</span><small id="cError"></small></span>
+  <button class="c-btn ghost" id="cExpand" title="חלון מלא" aria-label="חלון מלא"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-6 6M4 20l6-6" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg></button>
+</div>
 
 <div class="scroll">
 <div class="sky" aria-hidden="true"><span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span></div>
