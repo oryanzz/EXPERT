@@ -63,6 +63,17 @@ game's terms of service - see the [disclaimer](#disclaimer).
      [python.org](https://www.python.org/downloads/)) and run `setup.bat` again.
 3. Start EXPERT from the desktop shortcut (or `run.bat`).
 
+## Update
+
+EXPERT checks GitHub for a new version when it starts. When one is out, a banner appears at the
+top of the window: click **Update now** (`עדכן עכשיו`). EXPERT closes, downloads the new version,
+keeps your history, screenshots, custom sound and settings, and reopens by itself.
+You can also double-click **`update.bat`** (for a `git clone` it runs `git pull`).
+
+> **On 1.0.0 or 1.0.1?** Those versions don't have the updater yet. Update once by hand: download
+> the latest zip, extract it over your EXPERT folder (replace the files) and run `setup.bat`.
+> From then on, updates are one click.
+
 ## Use
 
 > The interface is in Hebrew for now (button names are given below). Translations are welcome!
@@ -93,13 +104,15 @@ for personal use, e.g. with Audacity's *Windows WASAPI* loopback recording.)
 | "Another window is covering the EXP bar" | Move the other window (or EXPERT) off the bottom of the game. |
 | Black screenshot | Switch the game from full screen to windowed mode. |
 | Map not detected | Open the minimap in the game, or type the map in **Manual fix**. |
+| Update failed | The reason is in `update.log` in the EXPERT folder; you can always update by hand (see [Update](#update)). |
 | Something else | Check `app.log` in the EXPERT folder and [open an issue](https://github.com/oryanzz/EXPERT/issues). |
 
 ## Privacy
 
 - Everything stays **on your computer**: screenshots (`shots/`), history (`history.csv`) and
   settings. EXPERT has no accounts, telemetry, or analytics and uploads nothing.
-- The only network request is loading the UI fonts from Google Fonts when you are online.
+- The only network requests are loading the UI fonts from Google Fonts and, at startup, asking
+  GitHub whether a newer version exists. Nothing about you or your game is sent.
 - Screenshots can show other players' names and chat - think twice before sharing them.
 
 ## Development

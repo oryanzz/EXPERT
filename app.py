@@ -4,6 +4,7 @@ import ctypes
 import ctypes.wintypes as wt
 import io
 import os
+import subprocess
 import sys
 import threading
 import time
@@ -19,6 +20,7 @@ make_dpi_aware()  # must happen before any window exists
 import webview  # noqa: E402
 
 from maple_exp.layout import fitted_height  # noqa: E402
+from maple_exp.update import check_for_update  # noqa: E402
 from maple_exp.history import append_session, known_maps, load_recent, replace_last  # noqa: E402
 from maple_exp.minimap import MapVotes, canonical_name  # noqa: E402
 from maple_exp.ocr import BarReader, crop_for_display  # noqa: E402
@@ -261,6 +263,7 @@ class Api:
     def __init__(self):
         self._reader = BarReader()
         self._session: Session | None = None
+        self._update: dict | None = None  # latest release found by check_update()
         threading.Thread(target=self._reader.warm_up, daemon=True).start()
 
     def get_state(self) -> dict:
@@ -313,6 +316,27 @@ class Api:
 
     def history(self) -> list[dict]:
         return load_recent(HISTORY)
+
+    def check_update(self) -> dict | None:
+        """Newer release on GitHub, or None (up to date / offline). Called once at startup."""
+        self._update = check_for_update()
+        return self._update
+
+    def open_release(self) -> None:
+        if self._update and self._update["url"].startswith(REPO_URL + "/"):
+            os.startfile(self._update["url"])  # only the official release page from the check
+
+    def start_update(self) -> dict:
+        """Hand over to scripts/update.ps1 (it waits for this process to exit), then close."""
+        if self._session and self._session.phase in ("countdown", "running", "finalizing"):
+            return {"ok": False, "error": "אי אפשר לעדכן באמצע טיימר"}
+        subprocess.Popen(
+            ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(ROOT / "scripts" / "update.ps1"),
+             "-WaitPid", str(os.getpid()), "-Restart"],
+            cwd=ROOT, creationflags=subprocess.CREATE_NEW_CONSOLE,
+        )
+        self.close()
+        return {"ok": True}
 
     def app_info(self) -> dict:
         return {"version": __version__, "repo": REPO_URL}

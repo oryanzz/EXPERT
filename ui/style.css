@@ -87,6 +87,22 @@ svg { width: 18px; height: 18px; flex: none; }
 .tb-btn.close:hover { background: linear-gradient(#ef6b55, #cf3a2b); color: #fff; }
 .tb-btn:active { transform: translateY(2px); box-shadow: 0 0 0 var(--wood-dark); }
 
+.update-bar {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 7px 8px 7px 10px;
+  background: linear-gradient(#fff6d6, #ffe08a); border: 2px solid var(--wood); border-radius: 12px;
+  box-shadow: 0 3px 0 var(--wood-dark); font-size: 13px; font-weight: 800; color: var(--wood-dark);
+}
+.update-bar svg { width: 18px; height: 18px; color: #2e8049; flex: none; }
+.update-text { flex: 1; }
+.update-bar a { color: #b9560a; font-size: 12px; }
+.update-btn {
+  height: 28px; padding: 0 12px; border-radius: 8px; border: 2px solid var(--wood); color: #fff;
+  font-family: var(--display); font-weight: 600; font-size: 13px; text-shadow: 0 1px 0 var(--wood-dark);
+  background: linear-gradient(#57c27a, #2e8049); box-shadow: 0 2px 0 var(--wood-dark);
+}
+.update-btn:disabled { filter: grayscale(.6); cursor: progress; }
+.update-btn:active { transform: translateY(2px); box-shadow: 0 0 0 var(--wood-dark); }
+
 .status-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
 .tagline { font-size: 11px; font-weight: 800; letter-spacing: 2.4px; color: var(--wood); }
 .tagline b { color: #d7650f; font-weight: 800; }

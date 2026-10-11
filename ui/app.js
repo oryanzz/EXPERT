@@ -254,6 +254,23 @@ function showMap(name) {
   $("mapNote").title = name || "";
 }
 
+// ---------- updates ----------
+function showUpdate(info) {
+  if (!info) return;
+  $("updateVersion").textContent = "v" + info.version;
+  $("updateBar").hidden = false;
+}
+
+function wireUpdate() {
+  $("updateNotes").addEventListener("click", (e) => { e.preventDefault(); api.open_release(); });
+  $("updateBtn").addEventListener("click", async () => {
+    const btn = $("updateBtn");
+    btn.disabled = true; btn.textContent = "מעדכן…";
+    const res = await api.start_update();  // on success the app closes and reopens updated
+    if (!res.ok) { btn.disabled = false; btn.textContent = "עדכן עכשיו"; $("updateBar").title = res.error; alert(res.error); }
+  });
+}
+
 // the window hugs its content: report the height whenever it changes (phase, history, edit form)
 let lastFit = 0;
 function fitWindow() {
@@ -270,7 +287,9 @@ window.addEventListener("pywebviewready", () => {
   setMinutes(store.get("minutes", "10"));
   if (store.get("pin", "1") === "0") { $("pinBtn").classList.remove("active"); api.set_on_top(false); }
   wire();
+  wireUpdate();
   api.app_info().then((i) => { $("appVersion").textContent = "v" + i.version; });
+  api.check_update().then(showUpdate);
   $("repoLink").addEventListener("click", (e) => { e.preventDefault(); api.open_repo(); });
   loadHistory();
   tick();
