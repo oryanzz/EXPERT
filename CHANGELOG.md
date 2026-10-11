@@ -3,6 +3,13 @@
 All notable changes to EXPERT are listed here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- The taskbar and Alt+Tab show the EXPERT stopwatch instead of the Python icon. EXPERT now has its
+  own taskbar identity, also stamped on the shortcut, so a pinned EXPERT and the running window
+  share one button (re-run `setup.bat` to refresh an existing shortcut).
+
 ## [1.0.1] - 2026-10-11
 
 ### Changed

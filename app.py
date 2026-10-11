@@ -33,6 +33,8 @@ SOUNDS = ROOT / "sounds"
 HISTORY = ROOT / "history.csv"
 WEB_STORAGE = ROOT / ".webview"
 REPO_URL = "https://github.com/oryanzz/EXPERT"
+ICON = ROOT / "ui" / "icon.ico"
+APP_ID = "ORYANZ.EXPERT"  # taskbar identity; scripts/make_shortcut.ps1 stamps the same ID on the shortcut
 SAMPLE_EVERY = 10  # seconds between live readings while the timer runs
 WIN_W, WIN_H = 440, 860
 
@@ -449,9 +451,12 @@ def main():
     if sys.stderr is None:  # started via pythonw (the shortcut): no console, so log to a file
         sys.stdout = sys.stderr = open(ROOT / "app.log", "a", encoding="utf-8", buffering=1)
     clear_web_cache(WEB_STORAGE)  # never run a stale cached app.js after an update
+    # Own taskbar identity: without it Windows groups the window under pythonw.exe and shows
+    # Python's icon. Must be set before the window exists.
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(APP_ID)
     create_main_window(Api())
     # non-private so the last minutes / pin choice survive restarts
-    webview.start(private_mode=False, storage_path=str(WEB_STORAGE))
+    webview.start(icon=str(ICON), private_mode=False, storage_path=str(WEB_STORAGE))
 
 
 if __name__ == "__main__":
