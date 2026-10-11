@@ -3,7 +3,7 @@
 All notable changes to EXPERT are listed here. The project follows
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.0.3] - 2026-10-11
 
 ### Changed
 - The update button is now a single word: `עדכון`.
@@ -45,6 +45,7 @@ First public release.
 - Custom end sound via `sounds/done.wav`.
 - `setup.bat` installer with desktop shortcut, and `run.bat`.
 
+[1.0.3]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.3
 [1.0.2]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.2
 [1.0.1]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.1
 [1.0.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.0
