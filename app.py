@@ -3,7 +3,9 @@ import base64
 import ctypes
 import ctypes.wintypes as wt
 import io
+import json
 import os
+import shutil
 import subprocess
 import sys
 import threading
@@ -25,17 +27,20 @@ from maple_exp.history import append_session, known_maps, load_recent, replace_l
 from maple_exp.minimap import MapVotes, canonical_name  # noqa: E402
 from maple_exp.ocr import BarReader, crop_for_display  # noqa: E402
 from maple_exp.parse import Reading  # noqa: E402
+from maple_exp.paths import app_dirs  # noqa: E402
 from maple_exp.sound import pick_sound  # noqa: E402
 from maple_exp.tracker import Summary, Tracker  # noqa: E402
 from maple_exp.webcache import clear_web_cache  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent
-SHOTS = ROOT / "shots"
-SOUNDS = ROOT / "sounds"
-HISTORY = ROOT / "history.csv"
-WEB_STORAGE = ROOT / ".webview"
+FROZEN = getattr(sys, "frozen", False)  # running as the single-file EXPERT.exe
+RES, DATA = app_dirs(FROZEN, ROOT, getattr(sys, "_MEIPASS", None), os.environ)  # see maple_exp/paths.py
+SHOTS = DATA / "shots"
+SOUNDS = DATA / "sounds"  # the user's own done.wav; the default chime ships in RES / "sounds"
+HISTORY = DATA / "history.csv"
+WEB_STORAGE = DATA / ".webview"
 REPO_URL = "https://github.com/oryanzz/EXPERT"
-ICON = ROOT / "ui" / "icon.ico"
+ICON = RES / "ui" / "icon.ico"
 APP_ID = "ORYANZ.EXPERT"  # taskbar identity; scripts/make_shortcut.ps1 stamps the same ID on the shortcut
 SAMPLE_EVERY = 10  # seconds between live readings while the timer runs
 WIN_W, WIN_H = 440, 860
@@ -75,7 +80,7 @@ def summary_dict(s: Summary) -> dict:
 
 def chime() -> None:
     """sounds/done.wav if the user added one (e.g. recorded from the game), else the bundled chime."""
-    path = pick_sound(SOUNDS)
+    path = pick_sound(SOUNDS, RES / "sounds")
     try:
         if path is None:
             raise RuntimeError("no sound file")
@@ -186,7 +191,7 @@ class Session:
                 time.sleep(1)
 
     def _snapshot(self, frame, res, label: str) -> dict:
-        SHOTS.mkdir(exist_ok=True)
+        SHOTS.mkdir(parents=True, exist_ok=True)
         name = f"{self.stamp:%Y-%m-%d_%H-%M-%S}_{label}.jpg"
         frame.image.save(SHOTS / name, quality=90)
         buf = io.BytesIO()
@@ -319,7 +324,7 @@ class Api:
 
     def check_update(self) -> dict | None:
         """Newer release on GitHub, or None (up to date / offline). Called once at startup."""
-        self._update = check_for_update()
+        self._update = check_for_update(need_exe=FROZEN)
         return self._update
 
     def open_release(self) -> None:
@@ -327,14 +332,23 @@ class Api:
             os.startfile(self._update["url"])  # only the official release page from the check
 
     def start_update(self) -> dict:
-        """Hand over to scripts/update.ps1 (it waits for this process to exit), then close."""
+        """Hand over to the updater script (it waits for this app to exit), then close."""
         if self._session and self._session.phase in ("countdown", "running", "finalizing"):
             return {"ok": False, "error": "אי אפשר לעדכן באמצע טיימר"}
-        subprocess.Popen(
-            ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(ROOT / "scripts" / "update.ps1"),
-             "-WaitPid", str(os.getpid()), "-Restart"],
-            cwd=ROOT, creationflags=subprocess.CREATE_NEW_CONSOLE,
-        )
+        ps = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File"]
+        if FROZEN:
+            if not (self._update and self._update.get("exe_url")):
+                return {"ok": False, "error": "אין עדכון זמין"}
+            # the bundle folder (RES) is deleted when the exe exits, so run the script from DATA
+            script = DATA / "update_exe.ps1"
+            shutil.copyfile(RES / "scripts" / "update_exe.ps1", script)
+            args = ps + [str(script), "-ExePath", sys.executable, "-Url", self._update["exe_url"],
+                         "-WaitPids", f"{os.getpid()},{os.getppid()}", "-Log", str(DATA / "update.log")]
+            cwd = DATA
+        else:
+            args = ps + [str(ROOT / "scripts" / "update.ps1"), "-WaitPid", str(os.getpid()), "-Restart"]
+            cwd = ROOT
+        subprocess.Popen(args, cwd=cwd, creationflags=subprocess.CREATE_NEW_CONSOLE)
         self.close()
         return {"ok": True}
 
@@ -345,7 +359,7 @@ class Api:
         os.startfile(REPO_URL)  # fixed URL, opens in the default browser
 
     def open_shots(self) -> None:
-        SHOTS.mkdir(exist_ok=True)
+        SHOTS.mkdir(parents=True, exist_ok=True)
         os.startfile(SHOTS)
 
     def set_on_top(self, flag) -> None:
@@ -448,7 +462,7 @@ def create_main_window(api: "Api"):
     """Frameless floating window; the page draws its own title bar (drag region + buttons)."""
     x, y = initial_position()
     window = webview.create_window(
-        WINDOW_TITLE, str(ROOT / "ui" / "index.html"), js_api=api,
+        WINDOW_TITLE, str(RES / "ui" / "index.html"), js_api=api,
         width=WIN_W, height=WIN_H, x=x, y=y,
         frameless=True, easy_drag=False, on_top=True, background_color="#9fd8ff",
     )
@@ -471,9 +485,20 @@ def initial_position():
     return None, None
 
 
+def selftest(image: str, out: str) -> int:
+    """`EXPERT.exe --selftest shot.png result.json`: prove the bundled OCR works (used by CI)."""
+    from maple_exp.selftest import run_selftest
+    result = run_selftest(Path(image))
+    Path(out).write_text(json.dumps(result), encoding="utf-8")
+    return 0 if result["ok"] else 1
+
+
 def main():
-    if sys.stderr is None:  # started via pythonw (the shortcut): no console, so log to a file
-        sys.stdout = sys.stderr = open(ROOT / "app.log", "a", encoding="utf-8", buffering=1)
+    if len(sys.argv) == 4 and sys.argv[1] == "--selftest":
+        sys.exit(selftest(sys.argv[2], sys.argv[3]))
+    DATA.mkdir(parents=True, exist_ok=True)
+    if sys.stderr is None:  # started without a console (shortcut / the .exe): log to a file
+        sys.stdout = sys.stderr = open(DATA / "app.log", "a", encoding="utf-8", buffering=1)
     clear_web_cache(WEB_STORAGE)  # never run a stale cached app.js after an update
     # Own taskbar identity: without it Windows groups the window under pythonw.exe and shows
     # Python's icon. Must be set before the window exists.

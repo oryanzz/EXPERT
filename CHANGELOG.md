@@ -3,6 +3,20 @@
 All notable changes to EXPERT are listed here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-10-11
+
+### Added
+- **`EXPERT.exe`** - a single-file download, no Python or setup needed:
+  `https://github.com/oryanzz/EXPERT/releases/latest/download/EXPERT.exe`.
+  Built and OCR-self-tested by GitHub Actions for every release, with a SHA256 checksum.
+- The exe updates itself from the banner, like the source version.
+- `EXPERT.exe --selftest image.png out.json` checks the bundled OCR.
+- `THIRD_PARTY_LICENSES.txt` with the license texts of everything bundled into the exe.
+
+### Changed
+- The exe keeps user data in `%LOCALAPPDATA%\EXPERT` (`EXPERT_DATA_DIR` overrides it);
+  a source install still keeps it in the EXPERT folder.
+
 ## [1.0.3] - 2026-10-11
 
 ### Changed
@@ -45,6 +59,7 @@ First public release.
 - Custom end sound via `sounds/done.wav`.
 - `setup.bat` installer with desktop shortcut, and `run.bat`.
 
+[1.1.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.1.0
 [1.0.3]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.3
 [1.0.2]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.2
 [1.0.1]: https://github.com/oryanzz/EXPERT/releases/tag/v1.0.1

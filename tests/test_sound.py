@@ -18,3 +18,12 @@ def test_no_sound_files(tmp_path):
 
 def test_missing_folder(tmp_path):
     assert pick_sound(tmp_path / "nope") is None
+
+
+def test_custom_sound_in_data_dir_default_in_bundle(tmp_path):
+    data, bundle = tmp_path / "data", tmp_path / "bundle"
+    data.mkdir(); bundle.mkdir()
+    (bundle / "default.wav").write_bytes(b"x")
+    assert pick_sound(data, bundle) == bundle / "default.wav"
+    (data / "done.wav").write_bytes(b"x")
+    assert pick_sound(data, bundle) == data / "done.wav"

@@ -28,6 +28,17 @@ window and saves a screenshot of every screen to `dev/out/`:
 .venv\Scripts\python dev\harness.py 0.5   # a 30-second session
 ```
 
+### Building the exe
+
+```bash
+build_exe.bat          # builds dist\EXPERT.exe and self-tests its OCR
+```
+
+Releases don't need a local build: publishing a GitHub release runs the
+[Release exe](.github/workflows/release.yml) workflow, which builds, self-tests and attaches
+`EXPERT.exe`. If you change `requirements.txt`, regenerate the bundled license texts with
+`.venv\Scripts\python dev\gen_licenses.py`.
+
 ## Pull requests
 
 - Keep them focused - one fix or feature per PR.

@@ -18,3 +18,5 @@ sounds/done.wav
 dev/out/
 dev/sound_samples/
 update.log
+build/
+dist/

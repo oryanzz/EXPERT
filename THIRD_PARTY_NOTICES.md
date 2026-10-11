@@ -1,9 +1,13 @@
 # Third-party notices
 
 EXPERT itself is released under the [MIT License](LICENSE). It relies on the
-open-source projects below. None of them are bundled in this repository - they
-are downloaded from PyPI / Google Fonts when you install or run the app, under
-their own licenses.
+open-source projects below, each under its own license. The source repository
+doesn't include them (they come from PyPI / Google Fonts), but **`EXPERT.exe`
+bundles them**: the full license texts of every bundled package are in
+[THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt), which also ships inside the
+exe and with every release. `EXPERT.exe` is built with
+[PyInstaller](https://pyinstaller.org), whose bootloader is GPL-2.0-or-later with
+an exception that allows distributing bundled programs under any license.
 
 ## Python packages
 
