@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EXPERT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&family=Rubik:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- frameless window: this bar replaces the Windows title bar; dragging it moves the window -->
+<header class="titlebar pywebview-drag-region">
+  <div class="brand" dir="ltr" aria-label="EXPERT">
+    <svg class="watch" viewBox="0 0 64 64" aria-hidden="true">
+      <defs><linearGradient id="g-arc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbff9a"/><stop offset=".5" stop-color="#d9ea3c"/><stop offset="1" stop-color="#8cc21c"/></linearGradient></defs>
+      <rect x="25" y="2.5" width="14" height="8" rx="3" fill="#f58a1f" stroke="#4a2306" stroke-width="3.5"/>
+      <rect x="29" y="9" width="6" height="6" fill="#4a2306"/>
+      <rect x="46" y="11" width="9" height="7" rx="2.5" transform="rotate(45 50.5 14.5)" fill="#f58a1f" stroke="#4a2306" stroke-width="3.5"/>
+      <circle cx="32" cy="37" r="24" fill="#ffd34d" stroke="#4a2306" stroke-width="4.5"/>
+      <circle cx="32" cy="37" r="18.5" fill="#fff8e1" stroke="#c98a2a" stroke-width="1.5"/>
+      <circle cx="32" cy="37" r="13" fill="none" stroke="#4a2306" stroke-width="8.5" stroke-dasharray="57.2 100" transform="rotate(-90 32 37)" stroke-linecap="round"/>
+      <circle cx="32" cy="37" r="13" fill="none" stroke="url(#g-arc)" stroke-width="5" stroke-dasharray="57.2 100" transform="rotate(-90 32 37)" stroke-linecap="round"/>
+      <path d="M32 37 L21.6 44.6" stroke="#4a2306" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="32" cy="37" r="3.6" fill="#4a2306"/>
+    </svg>
+    <!-- the word is an EXP bar: EXP filled, ERT still empty (a gradient-filled layer over outlined letters) -->
+    <span class="wordmark"><span class="wm-base">EXPERT</span><span class="wm-fill" aria-hidden="true">EXP</span></span>
+  </div>
+  <div class="tb-buttons">
+    <button class="tb-btn active" id="pinBtn" title="תמיד מעל שאר החלונות" aria-label="תמיד מעל" aria-pressed="true">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3l6 6-3 1-4 4 1 5-2 2-4-5-5 5-1-1 5-5-5-4 2-2 5 1 4-4z" fill="currentColor"/></svg>
+    </button>
+    <button class="tb-btn" id="minBtn" title="מזער" aria-label="מזער">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="3" rx="1.5" fill="currentColor"/></svg>
+    </button>
+    <button class="tb-btn close" id="closeBtn" title="סגור" aria-label="סגור">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="scroll">
+<div class="sky" aria-hidden="true"><span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span></div>
+
+<div class="status-row">
+  <span class="chip" id="gameChip"><i class="dot"></i><span id="gameText">מחפש את המשחק…</span></span>
+  <span class="tagline" dir="ltr"><b>EXP</b> PER <b>T</b>IME</span>
+</div>
+
+<main>
+  <section class="window">
+    <div class="window-title"><h2 id="timerTitle">טיימר פארם</h2><span class="badge" id="phaseBadge">מוכן</span></div>
+    <div class="window-body">
+
+      <div class="view" id="view-idle">
+        <div class="field-label">כמה זמן לפארם?</div>
+        <div class="tabs" id="presets">
+          <button class="tab" data-min="5">5 דק'</button>
+          <button class="tab active" data-min="10">10 דק'</button>
+          <button class="tab" data-min="15">15 דק'</button>
+          <button class="tab" data-min="30">30 דק'</button>
+          <button class="tab" data-min="60">שעה</button>
+        </div>
+        <div class="row">
+          <label class="field narrow"><span>דקות</span><input id="minutes" type="number" min="1" max="600" step="1" value="10" dir="ltr"></label>
+          <div class="field grow">
+            <span>מפה</span>
+            <div class="map-note" id="mapNote">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5 7 12 7 12s7-7 7-12a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" fill="currentColor"/></svg>
+              <span id="mapNoteText">תזוהה אוטומטית מהמיני-מפה</span>
+            </div>
+          </div>
+        </div>
+        <button class="big-btn" id="startBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+          התחל טיימר
+        </button>
+        <p class="hint" id="startHint">אחרי הלחיצה יש 3 שניות לחזור למשחק, ואז צילום ראשון.</p>
+        <button class="ghost-btn wide" id="testBtn">בדיקת קריאה מהמסך</button>
+        <div class="test-result" id="testResult" hidden></div>
+      </div>
+
+      <div class="view" id="view-countdown" hidden>
+        <div class="countdown" id="countdownNum">3</div>
+        <p class="hint center">חזור למשחק, הצילום הראשון עוד רגע…</p>
+        <button class="ghost-btn wide" id="cancelBtn">ביטול</button>
+      </div>
+
+      <div class="view" id="view-running" hidden>
+        <div class="clock" dir="ltr" id="clock">10:00</div>
+        <div class="expbar"><div class="expbar-fill" id="progress"></div><span class="expbar-text" id="progressText"></span></div>
+        <div class="tiles three">
+          <div class="stat"><div class="stat-label">EXP לדקה</div><div class="stat-value" dir="ltr" id="liveRate">—</div></div>
+          <div class="stat"><div class="stat-label">EXP שנצבר</div><div class="stat-value" dir="ltr" id="liveGained">—</div></div>
+          <div class="stat"><div class="stat-label">זמן לרמה</div><div class="stat-value" id="liveEta">—</div></div>
+        </div>
+        <p class="status-line" id="liveStatus"></p>
+        <button class="stop-btn" id="stopBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>
+          עצור עכשיו וסכם
+        </button>
+      </div>
+
+      <div class="view" id="view-finalizing" hidden>
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="hint center">מצלם את המסך האחרון ומחשב…</p>
+      </div>
+
+      <div class="view" id="view-done" hidden>
+        <div class="warn" id="doneWarn" hidden></div>
+        <div class="tiles two">
+          <div class="stat hero"><div class="stat-label">EXP לדקה</div><div class="stat-value" dir="ltr" id="resRate">—</div></div>
+          <div class="stat hero"><div class="stat-label">EXP לשעה</div><div class="stat-value" dir="ltr" id="resHour">—</div></div>
+        </div>
+        <div class="stat hero gold">
+          <div class="ribbon">זמן לרמה הבאה</div>
+          <div class="stat-value xl" id="resEta">—</div>
+          <div class="stat-sub" id="resEtaSub"></div>
+        </div>
+        <div class="facts">
+          <div><span>סה"כ EXP</span><b dir="ltr" id="resGained">—</b></div>
+          <div><span>אחוזים</span><b dir="ltr" id="resPct">—</b></div>
+          <div><span>רמות</span><b dir="ltr" id="resLevels">—</b></div>
+          <div><span>משך</span><b id="resMinutes">—</b></div>
+        </div>
+        <div class="proof">
+          <div class="proof-head"><h3>מה נקרא מהמסך</h3><button class="link-btn" id="editBtn">תיקון ידני</button></div>
+          <div class="proof-row"><span class="proof-label">התחלה</span><img id="startCrop" alt=""><span class="proof-vals" dir="ltr" id="startVals"></span></div>
+          <div class="proof-row" id="endRow"><span class="proof-label">סיום</span><img id="endCrop" alt=""><span class="proof-vals" dir="ltr" id="endVals"></span></div>
+          <div class="proof-row"><span class="proof-label">מפה</span><span class="proof-map" id="mapVal"></span></div>
+          <form class="edit" id="editForm" hidden>
+            <div class="edit-grid">
+              <span></span><span class="edit-h">EXP</span><span class="edit-h">%</span>
+              <span class="proof-label">התחלה</span><input id="eStartExp" type="number" min="0" dir="ltr"><input id="eStartPct" type="number" min="0" max="100" step="0.01" dir="ltr">
+              <span class="proof-label edit-end">סיום</span><input class="edit-end" id="eEndExp" type="number" min="0" dir="ltr"><input class="edit-end" id="eEndPct" type="number" min="0" max="100" step="0.01" dir="ltr">
+              <span class="proof-label">מפה</span><input class="edit-map" id="eMap" type="text" maxlength="60" dir="ltr" placeholder="Tree Dungeon, Forest Up North IV">
+            </div>
+            <div class="edit-error" id="editError" hidden></div>
+            <button class="ghost-btn wide" type="submit">חשב מחדש</button>
+          </form>
+        </div>
+        <div class="row">
+          <button class="big-btn grow" id="againBtn">טיימר חדש</button>
+          <button class="ghost-btn" id="shotsBtn" title="פתח את תיקיית הצילומים">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.6l2 2h8.4A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z" fill="currentColor"/></svg>
+            צילומים
+          </button>
+        </div>
+      </div>
+
+      <div class="view" id="view-error" hidden>
+        <div class="error-box" id="errorText"></div>
+        <button class="big-btn" id="backBtn">חזרה</button>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="window">
+    <div class="window-title"><h2>היסטוריה</h2><span class="badge real">סשנים אחרונים</span></div>
+    <div class="window-body flush">
+      <div class="table-wrap">
+        <table class="hist">
+          <thead><tr><th>מתי</th><th>מפה</th><th>דק'</th><th>EXP/דקה</th><th>רמות</th></tr></thead>
+          <tbody id="histBody"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="histEmpty">עוד אין סשנים. תריץ את הראשון!</p>
+    </div>
+  </section>
+</main>
+<footer class="credit">
+  EXPERT <span dir="ltr" id="appVersion"></span> · נבנה ע״י <b dir="ltr">ORYANZ</b> · <a href="#" id="repoLink">קוד פתוח ב-GitHub</a>
+</footer>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

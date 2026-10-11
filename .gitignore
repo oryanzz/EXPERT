@@ -1,0 +1,19 @@
+# Python / tooling
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Personal data - never commit (screenshots show other players' names and chat)
+shots/
+history.csv
+app.log
+sounds/done.wav
+
+# Local runtime state
+.webview/
+*.lnk
+
+# Dev scratch output
+dev/out/
+dev/sound_samples/

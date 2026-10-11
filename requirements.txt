@@ -1,0 +1,6 @@
+# EXPERT runtime dependencies - Windows 10/11, Python 3.11 or 3.12
+# (onnxruntime needs >= 3.11; rapidocr_onnxruntime supports up to 3.12)
+pywebview==6.2.1
+rapidocr_onnxruntime==1.4.4
+Pillow==12.3.0
+numpy>=2.0,<3  # range: numpy 2.5 needs Python 3.12, older 2.x still supports 3.11

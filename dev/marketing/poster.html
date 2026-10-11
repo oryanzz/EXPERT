@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>EXPERT poster</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&family=Rubik:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fff8e7; --cream-2: #fdecc8; --ink: #3b1d06; --muted: #74553a;
+    --wood: #7a3b0c; --wood-dark: #4a2306; --orange: #f58a1f;
+    --bar-fill: linear-gradient(#fbff9a, #d9ea3c 45%, #9fcf22);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    width: 1080px; height: 1350px; overflow: hidden; position: relative;
+    font-family: "Rubik", "Nunito", sans-serif; color: var(--ink);
+    background: linear-gradient(#5fbcf8 0%, #bfe6ff 46%, #e6f6ff 70%, #eef8dc 100%);
+  }
+  .cloud { position: absolute; background: #fff; border-radius: 999px; opacity: .9;
+           box-shadow: 46px -22px 0 10px #fff, 98px 4px 0 -2px #fff; }
+  .c1 { width: 150px; height: 50px; top: 120px; left: 60px; }
+  .c2 { width: 120px; height: 40px; top: 60px; right: 120px; opacity: .75; }
+  .c3 { width: 170px; height: 54px; top: 1010px; left: -40px; opacity: .6; }
+  .c4 { width: 140px; height: 46px; top: 970px; right: 10px; opacity: .55; }
+
+  /* ---------- header ---------- */
+  .header { position: absolute; top: 44px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; }
+  .brand { display: flex; align-items: center; gap: 16px; direction: ltr; }
+  .watch { width: 92px; height: 92px; filter: drop-shadow(0 5px 0 var(--wood-dark)); }
+  .wordmark { position: relative; font: 700 98px/1 "Fredoka", sans-serif; letter-spacing: 4px; }
+  .wm-base { color: #fff3cf; -webkit-text-stroke: 16px var(--wood-dark); paint-order: stroke fill; text-shadow: 0 7px 0 var(--wood-dark); }
+  .wm-fill { position: absolute; left: 0; top: 0; color: transparent; background: var(--bar-fill);
+             -webkit-background-clip: text; background-clip: text; }
+  .slogan { margin-top: 14px; font: 900 21px "Nunito", sans-serif; letter-spacing: 9px; color: var(--wood); direction: ltr; }
+  .slogan b { color: #d7650f; }
+  .headline { margin: 30px 0 0; font: 800 54px/1.1 "Rubik", sans-serif; color: var(--wood-dark); text-align: center; }
+  .headline .hl { display: inline-block; padding: 0 14px 4px; border-radius: 14px; background: var(--bar-fill);
+                  border: 4px solid var(--wood-dark); box-shadow: 0 5px 0 var(--wood-dark); transform: rotate(-2deg); }
+  .sub { margin-top: 14px; font: 700 25px "Rubik", sans-serif; color: var(--muted); text-align: center; }
+
+  /* ---------- scene ---------- */
+  .frame { position: absolute; left: 40px; top: 388px; width: 908px; height: 570px;
+           border: 4px solid var(--wood-dark); border-radius: 18px; overflow: hidden;
+           box-shadow: 0 8px 0 var(--wood-dark), 0 22px 40px rgba(30, 15, 0, .35); }
+  .frame img { display: block; width: 900px; height: 562px; }
+  .ring { position: absolute; border: 4px solid #ffe14d; border-radius: 10px;
+          box-shadow: 0 0 0 3px var(--wood-dark), 0 0 22px 6px rgba(255, 225, 77, .85); }
+  .marker { position: absolute; width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center;
+            font: 700 29px/1 "Fredoka", sans-serif; color: #fff; text-shadow: 0 2px 0 var(--wood-dark);
+            background: linear-gradient(#ffb44d, #e8741c 60%, #d7650f); border: 4px solid var(--wood-dark);
+            box-shadow: 0 4px 0 var(--wood-dark), 0 0 0 5px rgba(255, 255, 255, .7); }
+
+  .app { position: absolute; right: 26px; top: 346px; width: 340px; border-radius: 10px; overflow: hidden;
+         box-shadow: 0 0 0 4px var(--wood-dark), 0 10px 0 4px var(--wood-dark), 0 30px 50px rgba(30, 15, 0, .45);
+         transform: rotate(1.5deg); }
+  .app img { display: block; width: 340px; }
+  .app .marker { left: 6px; top: 118px; }
+
+  /* ---------- steps ---------- */
+  .steps { position: absolute; left: 40px; right: 40px; top: 1072px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .step { position: relative; padding: 30px 18px 18px; border-radius: 18px; background: linear-gradient(var(--cream), var(--cream-2));
+          border: 4px solid var(--wood); box-shadow: 0 6px 0 var(--wood-dark); text-align: center; }
+  .step .marker { top: -27px; left: 50%; transform: translateX(-50%); }
+  .step h3 { margin: 6px 0 4px; font: 800 26px/1.15 "Rubik", sans-serif; color: var(--wood-dark); }
+  .step p { margin: 0; font: 700 18px/1.3 "Rubik", sans-serif; color: var(--muted); }
+
+  .footer { position: absolute; left: 0; right: 0; bottom: 34px; text-align: center; }
+  .footer .main { font: 800 24px "Rubik", sans-serif; color: var(--wood-dark); }
+  .footer .main span { color: #d7650f; }
+  .footer .small { margin-top: 5px; font: 700 15px "Rubik", sans-serif; color: var(--muted); opacity: .85; }
+</style>
+</head>
+<body>
+<span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span><span class="cloud c4"></span>
+
+<header class="header">
+  <div class="brand">
+    <svg class="watch" viewBox="0 0 64 64" aria-hidden="true">
+      <defs><linearGradient id="g-arc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbff9a"/><stop offset=".5" stop-color="#d9ea3c"/><stop offset="1" stop-color="#8cc21c"/></linearGradient></defs>
+      <rect x="25" y="2.5" width="14" height="8" rx="3" fill="#f58a1f" stroke="#4a2306" stroke-width="3.5"/>
+      <rect x="29" y="9" width="6" height="6" fill="#4a2306"/>
+      <rect x="46" y="11" width="9" height="7" rx="2.5" transform="rotate(45 50.5 14.5)" fill="#f58a1f" stroke="#4a2306" stroke-width="3.5"/>
+      <circle cx="32" cy="37" r="24" fill="#ffd34d" stroke="#4a2306" stroke-width="4.5"/>
+      <circle cx="32" cy="37" r="18.5" fill="#fff8e1" stroke="#c98a2a" stroke-width="1.5"/>
+      <circle cx="32" cy="37" r="13" fill="none" stroke="#4a2306" stroke-width="8.5" stroke-dasharray="57.2 100" transform="rotate(-90 32 37)" stroke-linecap="round"/>
+      <circle cx="32" cy="37" r="13" fill="none" stroke="url(#g-arc)" stroke-width="5" stroke-dasharray="57.2 100" transform="rotate(-90 32 37)" stroke-linecap="round"/>
+      <path d="M32 37 L21.6 44.6" stroke="#4a2306" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="32" cy="37" r="3.6" fill="#4a2306"/>
+    </svg>
+    <span class="wordmark"><span class="wm-base">EXPERT</span><span class="wm-fill">EXP</span></span>
+  </div>
+  <div class="slogan"><b>EXP</b> PER <b>T</b>IME</div>
+  <h1 class="headline">כמה EXP אתה <span class="hl">באמת</span> עושה בדקה?</h1>
+  <div class="sub">מפעילים טיימר, ממשיכים לפארם, ומקבלים סיכום מדויק בסוף</div>
+</header>
+
+<div class="frame">
+  <img src="scene_blurred.jpg" alt="">
+  <!-- coordinates = 1920x1200 client pixels x 0.46875 -->
+  <span class="ring" style="left:28px; top:14px; width:124px; height:34px"></span>
+  <span class="marker" style="left:160px; top:6px">1</span>
+  <span class="ring" style="left:472px; top:532px; width:92px; height:24px"></span>
+  <span class="marker" style="left:492px; top:470px">2</span>
+</div>
+
+<div class="app">
+  <img src="app_summary.png" alt="">
+  <span class="marker">3</span>
+</div>
+
+<section class="steps">
+  <div class="step"><span class="marker">1</span><h3>מזהה את המפה</h3><p>קורא את שם המפה מהמיני-מפה, בלי להקליד כלום</p></div>
+  <div class="step"><span class="marker">2</span><h3>קורא את ה-EXP</h3><p>מהבר שבתחתית המסך, כל 10 שניות, גם כשעולים רמה</p></div>
+  <div class="step"><span class="marker">3</span><h3>מסכם לך הכל</h3><p>EXP לדקה ולשעה, וכמה זמן נשאר לרמה הבאה</p></div>
+</section>
+
+<footer class="footer">
+  <div class="main">חינם <span>·</span> לא נוגע במשחק, רק קורא את המסך <span>·</span> היסטוריה לפי מפה</div>
+  <div class="small">כלי קהילתי לשחקני MapleStory Classic · לא קשור ל-Nexon</div>
+</footer>
+</body>
+</html>
