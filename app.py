@@ -23,7 +23,6 @@ import webview  # noqa: E402
 
 from maple_exp.layout import compact_rect, covers_monitor, dock_position, fitted_height  # noqa: E402
 from maple_exp.update import check_for_update  # noqa: E402
-from maple_exp.hotkey import HotkeyListener  # noqa: E402
 from maple_exp.history import append_session, known_maps, load_recent, replace_last  # noqa: E402
 from maple_exp.minimap import MapVotes, canonical_name  # noqa: E402
 from maple_exp.ocr import BarReader, crop_for_display  # noqa: E402
@@ -272,7 +271,6 @@ class Api:
         self._session: Session | None = None
         self._update: dict | None = None  # latest release found by check_update()
         self._full_width = 0  # the full window's width, kept while in compact mode
-        self._hotkey = HotkeyListener(self.toggle_visibility)  # the UI picks the key (default F11)
         threading.Thread(target=self._reader.warm_up, daemon=True).start()
 
     def get_state(self) -> dict:
@@ -417,20 +415,6 @@ class Api:
         if (w, h) != (r.right - r.left, r.bottom - r.top):
             user32.SetWindowPos(hwnd, None, x, y, w, h, SWP_ASYNC_MOVE_RESIZE)
 
-    def set_hotkey(self, spec) -> dict:
-        """Global show/hide key, e.g. 'F11'; 'off' disables it. ok=False if another program has it."""
-        return {"ok": self._hotkey.set_key(str(spec or "off"))}
-
-    def toggle_visibility(self) -> None:
-        """Hide EXPERT, or show it again without taking focus from the game."""
-        hwnd = own_window()
-        if not hwnd:
-            return
-        if user32.IsWindowVisible(hwnd) and not user32.IsIconic(hwnd):
-            user32.ShowWindowAsync(hwnd, SW_HIDE)
-        else:
-            user32.ShowWindowAsync(hwnd, SW_SHOWNOACTIVATE)
-
     def minimize(self) -> None:
         hwnd = own_window()
         if hwnd:
@@ -444,8 +428,8 @@ class Api:
     def _on_done(self):
         threading.Thread(target=chime, daemon=True).start()
         hwnd = own_window()
-        if hwnd and (user32.IsIconic(hwnd) or not user32.IsWindowVisible(hwnd)):
-            user32.ShowWindowAsync(hwnd, SW_SHOWNOACTIVATE)  # hidden or minimized: bring the summary back
+        if hwnd and user32.IsIconic(hwnd):
+            user32.ShowWindowAsync(hwnd, SW_RESTORE)
 
 
 # Window tweaks go through async Win32 calls on purpose. pywebview's own setters
@@ -463,7 +447,7 @@ user32.PostMessageW.argtypes = [wt.HWND, wt.UINT, wt.WPARAM, wt.LPARAM]
 HWND_TOPMOST, HWND_NOTOPMOST = -1, -2
 SWP_ASYNC_NOMOVE = 0x0001 | 0x0002 | 0x0010 | 0x4000  # NOSIZE | NOMOVE | NOACTIVATE | ASYNCWINDOWPOS
 SWP_ASYNC_MOVE_RESIZE = 0x0004 | 0x0010 | 0x4000  # NOZORDER | NOACTIVATE | ASYNCWINDOWPOS
-SW_HIDE, SW_SHOWNOACTIVATE, SW_MINIMIZE = 0, 4, 6
+SW_MINIMIZE, SW_RESTORE = 6, 9
 WM_CLOSE = 0x0010
 WINDOW_TITLE = "EXPERT"
 DWMWA_WINDOW_CORNER_PREFERENCE, DWMWCP_ROUND = 33, 2
