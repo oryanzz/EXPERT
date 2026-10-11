@@ -119,7 +119,7 @@ dev/                end-to-end harness, debugging probes, icon/sound/marketing g
 ```
 
 `dev/harness.py` drives the real app against a running game and screenshots every screen.
-See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request, and please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Credits
 
