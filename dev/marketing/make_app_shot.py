@@ -1,5 +1,7 @@
 """Screenshot the real EXPERT window showing the summary of a real session (02:30, East Rocky
-Mountain III), with the real history rows and their maps read from the saved shots."""
+Mountain III), with the real history rows and their maps read from the saved shots.
+
+usage: make_app_shot.py [he|en]   (writes app_summary.png / app_summary_en.png)"""
 import base64
 import ctypes
 import ctypes.wintypes as wt
@@ -21,6 +23,8 @@ from maple_exp.ocr import crop_for_display  # noqa: E402
 from maple_exp.tracker import Tracker  # noqa: E402
 
 SHOTS = ROOT / "shots"
+LANG = sys.argv[1] if len(sys.argv) > 1 else "he"
+OUT = HERE / ("app_summary.png" if LANG == "he" else f"app_summary_{LANG}.png")
 reader = app.BarReader()
 
 
@@ -59,17 +63,20 @@ class DemoApi(app.Api):
     def history(self):
         return HISTORY
 
+    def app_info(self):
+        return {**super().app_info(), "lang": LANG}  # as if Windows were in that language
+
 
 def drive(window):
     time.sleep(4.5)
     r = wt.RECT()
     ctypes.windll.user32.GetWindowRect(app.own_window(), ctypes.byref(r))
-    ImageGrab.grab(bbox=(r.left, r.top, r.right, r.bottom), all_screens=True).save(HERE / "app_summary.png")
-    print("saved", HERE / "app_summary.png", result, flush=True)
+    ImageGrab.grab(bbox=(r.left, r.top, r.right, r.bottom), all_screens=True).save(OUT)
+    print("saved", OUT, result, flush=True)
     os._exit(0)
 
 
-storage = ROOT / "dev" / "out" / ".webview-demo"
+storage = ROOT / "dev" / "out" / f".webview-demo-{LANG}"  # fresh per language: no saved choice
 app.clear_web_cache(storage)
 win = app.create_main_window(DemoApi())
 webview.start(drive, win, private_mode=False, storage_path=str(storage))

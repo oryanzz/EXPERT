@@ -3,6 +3,17 @@
 All notable changes to EXPERT are listed here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] - 2026-10-12
+
+### Added
+- **English interface.** EXPERT now speaks English and Hebrew. It opens in Hebrew when Windows is
+  in Hebrew, has a Hebrew keyboard or an Israeli region, and in English otherwise; the link at the
+  bottom of the window switches language and the choice is remembered. All texts live in
+  `ui/i18n.js`, so adding a language is one file.
+
+### Fixed
+- In the Hebrew compact strip, the time to level ("50 דק'") showed its unit on the wrong side.
+
 ## [1.3.1] - 2026-10-11
 
 ### Removed
@@ -89,6 +100,7 @@ First public release.
 - Custom end sound via `sounds/done.wav`.
 - `setup.bat` installer with desktop shortcut, and `run.bat`.
 
+[1.4.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.4.0
 [1.3.1]: https://github.com/oryanzz/EXPERT/releases/tag/v1.3.1
 [1.3.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.3.0
 [1.2.0]: https://github.com/oryanzz/EXPERT/releases/tag/v1.2.0

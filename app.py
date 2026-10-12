@@ -24,6 +24,7 @@ import webview  # noqa: E402
 from maple_exp.layout import compact_rect, covers_monitor, dock_position, fitted_height  # noqa: E402
 from maple_exp.update import check_for_update  # noqa: E402
 from maple_exp.history import append_session, known_maps, load_recent, replace_last  # noqa: E402
+from maple_exp.i18n import system_language  # noqa: E402
 from maple_exp.minimap import MapVotes, canonical_name  # noqa: E402
 from maple_exp.ocr import BarReader, crop_for_display  # noqa: E402
 from maple_exp.parse import Reading  # noqa: E402
@@ -46,13 +47,11 @@ SAMPLE_EVERY = 10  # seconds between live readings while the timer runs
 WIN_W, WIN_H = 440, 860
 MIN_W, MIN_H = 160, 40  # small enough for the compact strip
 
-ERRORS = {
-    "not_found": "MapleStory לא פתוח",
-    "minimized": "חלון המשחק ממוזער",
-    "black": "הצילום יצא שחור. העבר את המשחק למצב חלון",
-    "covered": "חלון אחר מכסה את בר ה-EXP",
-    "unreadable": "לא הצלחתי לקרוא את ה-EXP מהמסך",
-}
+
+def fail(code: str) -> dict:
+    """A failed API call. Errors travel as short codes; the page words them in the user's
+    language (ui/i18n.js: "err.<code>")."""
+    return {"ok": False, "error": code}
 
 
 def read_game(reader: BarReader):
@@ -106,7 +105,8 @@ class Session:
         self.samples: list[tuple[float, Reading]] = []  # accepted readings, in order
         self.tracker: Tracker | None = None
         self.result: dict | None = None
-        self.error = self.warning = None
+        self.error = self.warning = None  # codes, worded by the page ("err.<code>" / "warn.<code>")
+        self.error_detail = self.warning_reason = ""
         self.failed_reads = 0
         self.stamp = datetime.now()
         self._stop = threading.Event()
@@ -121,9 +121,15 @@ class Session:
         try:
             self._loop()
         except CaptureError as e:
-            self.phase, self.error = "error", ERRORS[e.code]
+            self._fail(e.code)
         except Exception as e:  # keep the UI alive whatever happens
-            self.phase, self.error = "error", f"שגיאה לא צפויה: {e}"
+            self._fail("unexpected", str(e))
+
+    def _fail(self, code: str, detail: str = ""):
+        self.phase, self.error, self.error_detail = "error", code, detail
+
+    def _warn(self, code: str, reason: str = ""):
+        self.warning, self.warning_reason = code, reason
 
     def _loop(self):
         while time.monotonic() < self.countdown_until:
@@ -158,9 +164,9 @@ class Session:
             if self.end["accepted"]:
                 self.samples.append((t, res.reading))
             else:
-                self.warning = "קריאת הסיום לא הסתדרה עם הקודמות, אז החישוב הוא עד הקריאה התקינה האחרונה. בדוק את המספרים למטה."
+                self._warn("end_rejected")
         except CaptureError as e:
-            self.warning = f"צילום הסיום נכשל ({ERRORS[e.code]}), אז החישוב הוא עד הקריאה האחרונה שהצליחה."
+            self._warn("end_failed", e.code)
         self._finish()
 
     def _sample(self):
@@ -231,12 +237,13 @@ class Session:
         if self.end:
             end = Reading(end_exp, end_pct, self.end["level"])
             if not tracker.add(self.end["t"], end):
-                return "המספרים שהזנת לא מסתדרים זה עם זה (בדוק את האחוזים)"
+                return "mismatch"  # error code
             samples.append((self.end["t"], end))
             self.end.update(exp=end_exp, pct=end_pct, accepted=True)
         self.start.update(exp=start_exp, pct=start_pct)
         self.map_name = " ".join(map_name.split())  # the user's spelling becomes the known name
-        self.tracker, self.samples, self.warning = tracker, samples, None
+        self.tracker, self.samples = tracker, samples
+        self._warn(None)
         self._finish(replace=True)
         return None
 
@@ -259,7 +266,9 @@ class Session:
             "start": self.start,
             "end": self.end,
             "error": self.error,
+            "error_detail": self.error_detail,
             "warning": self.warning,
+            "warning_reason": self.warning_reason,
             "failed_reads": self.failed_reads,
             "samples": len(self.samples),
         }
@@ -286,7 +295,7 @@ class Api:
         try:
             frame, res = read_game(self._reader)
         except CaptureError as e:
-            return {"ok": False, "error": ERRORS[e.code]}
+            return fail(e.code)
         buf = io.BytesIO()
         crop_for_display(frame.image, res.box).save(buf, "PNG")
         r = res.reading
@@ -296,10 +305,10 @@ class Api:
 
     def start(self, minutes, delay=3) -> dict:
         if self._session and self._session.phase in ("countdown", "running", "finalizing"):
-            return {"ok": False, "error": "טיימר כבר רץ"}
+            return fail("busy")
         minutes = float(minutes)
         if not 0 < minutes <= 600:
-            return {"ok": False, "error": "בחר בין דקה ל-600 דקות"}
+            return fail("bad_minutes")
         self._session = Session(self._reader, minutes, int(delay), self._on_done)
         return {"ok": True}
 
@@ -314,12 +323,12 @@ class Api:
 
     def recompute(self, start_exp, start_pct, end_exp, end_pct, map_name="") -> dict:
         if not self._session or self._session.phase != "done":
-            return {"ok": False, "error": "אין סשן לתקן"}
+            return fail("no_session")
         try:
             err = self._session.recompute(int(start_exp), float(start_pct), int(end_exp), float(end_pct),
                                           str(map_name or ""))
         except (TypeError, ValueError):
-            return {"ok": False, "error": "מספר לא תקין"}
+            return fail("bad_number")
         return {"ok": err is None, "error": err}
 
     def history(self) -> list[dict]:
@@ -337,11 +346,11 @@ class Api:
     def start_update(self) -> dict:
         """Hand over to the updater script (it waits for this app to exit), then close."""
         if self._session and self._session.phase in ("countdown", "running", "finalizing"):
-            return {"ok": False, "error": "אי אפשר לעדכן באמצע טיימר"}
+            return fail("update_busy")
         ps = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File"]
         if FROZEN:
             if not (self._update and self._update.get("exe_url")):
-                return {"ok": False, "error": "אין עדכון זמין"}
+                return fail("no_update")
             # the bundle folder (RES) is deleted when the exe exits, so run the script from DATA
             script = DATA / "update_exe.ps1"
             shutil.copyfile(RES / "scripts" / "update_exe.ps1", script)
@@ -356,7 +365,7 @@ class Api:
         return {"ok": True}
 
     def app_info(self) -> dict:
-        return {"version": __version__, "repo": REPO_URL}
+        return {"version": __version__, "repo": REPO_URL, "lang": system_language()}
 
     def open_repo(self) -> None:
         os.startfile(REPO_URL)  # fixed URL, opens in the default browser

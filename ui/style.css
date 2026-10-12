@@ -267,7 +267,7 @@ main { display: flex; flex-direction: column; gap: 18px; }
   font-family: var(--display); font-weight: 700; font-size: 21px; line-height: 1.15;
   font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-[dir="ltr"].stat-value { text-align: right; }
+html[dir="rtl"] .stat-value[dir="ltr"] { text-align: right; }  /* LTR numbers in a Hebrew page */
 .stat.hero { padding: 12px 14px; box-shadow: 0 5px 0 var(--wood-dark); }
 .stat.hero .stat-value { font-size: 26px; }
 .stat.gold {
@@ -315,8 +315,9 @@ main { display: flex; flex-direction: column; gap: 18px; }
 .edit-grid { display: grid; grid-template-columns: 46px 1fr 90px; gap: 6px 8px; align-items: center; margin-bottom: 10px; }
 .edit-h { font-size: 12px; font-weight: 800; color: var(--muted); text-align: center; }
 .edit-map { grid-column: span 2; }
-.proof-map { font-family: var(--display); font-weight: 600; font-size: 14px; direction: ltr; text-align: right; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.proof-map.missing { font-family: var(--body); font-weight: 700; font-size: 13px; color: var(--muted); direction: rtl; }
+.proof-map { font-family: var(--display); font-weight: 600; font-size: 14px; direction: ltr; text-align: left; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.proof-map.missing { font-family: var(--body); font-weight: 700; font-size: 13px; color: var(--muted); direction: inherit; }
+html[dir="rtl"] .proof-map { text-align: right; }
 
 .map-note {
   display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 10px;
@@ -345,7 +346,8 @@ main { display: flex; flex-direction: column; gap: 18px; }
 }
 .hist td { padding: 8px; border-bottom: 1px solid #f0dfbd; font-weight: 700; white-space: nowrap; }
 .hist td.num { font-family: var(--display); font-weight: 600; font-variant-numeric: tabular-nums; }
-.hist td.map span { display: block; max-width: 128px; overflow: hidden; text-overflow: ellipsis; text-align: right; }
+.hist td.map span { display: block; max-width: 128px; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+html[dir="rtl"] .hist td.map span { text-align: right; }
 .hist tbody tr:first-child td { background: #fff1d6; }
 .hist tbody tr:hover td { background: #ffe9bf; }
 .lvl-pill {
@@ -372,8 +374,8 @@ body.compact-mode .compact {
 .c-view { display: none; align-items: center; gap: 8px; }
 .c-view.on { display: inline-flex; }
 .compact .num { font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; }
-.compact small { font-size: 11px; font-weight: 800; color: var(--muted);
-                 direction: rtl; unicode-bidi: isolate; }  /* Hebrew labels inside the LTR strip */
+.compact small { font-size: 11px; font-weight: 800; color: var(--muted); unicode-bidi: isolate; }
+html[dir="rtl"] .compact small { direction: rtl; }  /* Hebrew labels inside the LTR strip */
 .compact .sep { width: 2px; height: 22px; background: #e2c48d; }
 .c-btn {
   display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border-radius: 50%;
@@ -399,3 +401,7 @@ body.compact-mode .compact {
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #d8b47a; border-radius: 99px; border: 2px solid var(--cream); }
+
+/* until the UI language is known (first start): stay hidden rather than flash the wrong one */
+.i18n-wait body { visibility: hidden; }
+html[dir="rtl"] #cDoneEta { direction: rtl; unicode-bidi: isolate; }  /* "50 דק'" inside the LTR strip */

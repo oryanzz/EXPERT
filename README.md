@@ -13,7 +13,7 @@ and tells you exactly how much EXP you make per minute, per hour, and how long u
 
 **English** · [עברית](README.he.md)
 
-<img src="docs/images/poster.png" alt="EXPERT in action: the game on the left, the EXPERT summary window on the right" width="560">
+<img src="docs/images/poster_en.png" alt="EXPERT in action: the game on the left, the EXPERT summary window on the right" width="560">
 
 </div>
 
@@ -80,7 +80,7 @@ For developers, or if you prefer not to run an exe. Needs Python **3.11 or 3.12*
 ## Update
 
 EXPERT checks GitHub for a new version when it starts. When one is out, a banner appears at the
-top of the window - nothing changes until you click **Update** (`עדכון`). Then EXPERT closes,
+top of the window - nothing changes until you click **Update**. Then EXPERT closes,
 installs the new version, keeps your history, screenshots, custom sound and settings, and
 reopens by itself. (From source you can also run **`update.bat`**; a `git clone` runs `git pull`.)
 
@@ -90,11 +90,13 @@ reopens by itself. (From source you can also run **`update.bat`**; a `git clone`
 
 ## Use
 
-> The interface is in Hebrew for now (button names are given below). Translations are welcome!
+> EXPERT speaks **English and Hebrew**. It opens in your Windows language; switch any time with
+> the language link at the bottom of the window. Want another language? Add it to
+> [`ui/i18n.js`](ui/i18n.js) - pull requests are welcome!
 
 1. Open the game in windowed mode. EXPERT opens beside it.
-2. Click **Screen-read check** (`בדיקת קריאה מהמסך`) to confirm it reads your EXP and map correctly.
-3. Pick the minutes and press **Start timer** (`התחל טיימר`). You get 3 seconds to switch back to the game.
+2. Click **Test screen reading** to confirm it reads your EXP and map correctly.
+3. Pick the minutes and press **Start timer**. You get 3 seconds to switch back to the game.
 4. While it runs you see a live EXP/min. When the time is up you hear a chime and get the summary.
 
 Tips:
@@ -108,7 +110,7 @@ Tips:
   starts while the game is full screen on the same monitor; the expand button brings the full
   window back.
 - Drag the window by its orange title bar. The pin button keeps it above other windows.
-- If a number or the map name was misread, use **Manual fix** (`תיקון ידני`) in the summary.
+- If a number or the map name was misread, use **Fix manually** in the summary.
   A corrected map name is remembered, so the same map is always written the same way.
 
 ### Your own end sound
@@ -122,11 +124,11 @@ for personal use, e.g. with Audacity's *Windows WASAPI* loopback recording.)
 
 | Problem | Fix |
 |---|---|
-| "MapleStory is not open" | Start the game first; EXPERT looks for its window. |
+| "MapleStory isn't open" | Start the game first; EXPERT looks for its window. |
 | "Another window is covering the EXP bar" | Move the other window (or EXPERT) off the bottom of the game. |
 | "Windows protected your PC" | Click **More info → Run anyway** (see [Install](#install)). |
 | Black screenshot | Your PC runs the game in exclusive full screen - switch the game to windowed mode. |
-| Map not detected | Open the minimap in the game, or type the map in **Manual fix**. |
+| Map not detected | Open the minimap in the game, or type the map in **Fix manually**. |
 | Update failed | The reason is in `update.log` in the EXPERT folder; you can always update by hand (see [Update](#update)). |
 | Something else | Check `app.log` in the EXPERT folder and [open an issue](https://github.com/oryanzz/EXPERT/issues). |
 

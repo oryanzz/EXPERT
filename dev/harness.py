@@ -85,7 +85,7 @@ def drive(window):
     shot("4_running_mid")
     deadline = time.time() + MINUTES * 60 + 30
     while time.time() < deadline:
-        if js(window, "document.getElementById('phaseBadge').innerText") in ("הושלם", "שגיאה"):
+        if js(window, "document.getElementById('phaseBadge').className") in ("badge done", "badge err"):  # any language
             break
         time.sleep(1)
     time.sleep(1.5)

@@ -3,11 +3,52 @@ const intFmt = new Intl.NumberFormat("en-US");
 let api = null;
 let lastPhase = null;
 let gameFound = false;
+let lastTest = null;  // last screen-reading test, re-shown when the language changes
 
 const store = {
   get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch { /* storage unavailable */ } },
 };
+
+// ---------- language (texts: i18n.js) ----------
+let LANG = "he";
+
+function t(key, vars = {}) {
+  const s = STRINGS[LANG][key] ?? STRINGS.he[key] ?? key;
+  return s.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
+}
+// errors and warnings arrive from Python as short codes (covered, busy, end_failed...)
+function errText(code, detail = "") {
+  const key = `err.${code}`;
+  return !code ? "" : STRINGS[LANG][key] ? t(key, { detail }) : String(code);
+}
+function warnText(code, reason = "") {
+  const key = `warn.${code}`;
+  return !code ? "" : STRINGS[LANG][key] ? t(key, { reason: errText(reason) }) : String(code);
+}
+
+function applyLang(lang) {
+  LANG = STRINGS[lang] ? lang : "en";
+  const root = document.documentElement;
+  root.lang = LANG;
+  root.dir = LANG === "he" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n, { n: el.dataset.n }); });
+  document.querySelectorAll("[data-i18n-title]").forEach((el) => {
+    el.title = t(el.dataset.i18nTitle);
+    if (el.tagName === "BUTTON") el.setAttribute("aria-label", el.title);
+  });
+  root.classList.remove("i18n-wait");
+}
+
+function switchLang() {
+  const next = LANG === "he" ? "en" : "he";
+  store.set("lang", next);
+  applyLang(next);
+  if (lastTest) showTest(lastTest);
+  lastPhase = null;  // re-render the current view in the new language
+  loadHistory();
+  tick();
+}
 
 // ---------- formatting ----------
 function num(n) {
@@ -19,24 +60,24 @@ function num(n) {
 }
 function signed(n) { return (n > 0 ? "+" : "") + num(n); }
 
-function hoursHe(h) { return h === 1 ? "שעה" : h === 2 ? "שעתיים" : `${h} שעות`; }
-function minutesHe(m) { return m === 1 ? "דקה" : `${m} דקות`; }
+function hoursText(h) { return h === 1 ? t("eta.hour1") : h === 2 ? t("eta.hour2") : t("eta.hours", { n: h }); }
+function minutesText(m) { return m === 1 ? t("eta.min1") : t("eta.mins", { n: m }); }
 function etaLong(min) {
   if (min == null || !isFinite(min)) return "—";
-  if (min < 1) return "פחות מדקה";
+  if (min < 1) return t("eta.lt_min");
   const m = Math.round(min);
-  if (m >= 48 * 60) return `${(m / 1440).toFixed(1)} ימים`;
-  if (m < 60) return minutesHe(m);
+  if (m >= 48 * 60) return t("eta.days", { n: (m / 1440).toFixed(1) });
+  if (m < 60) return minutesText(m);
   const h = Math.floor(m / 60), r = m % 60;
-  return r ? `${hoursHe(h)} ו-${minutesHe(r)}` : hoursHe(h);
+  return r ? t("eta.and", { h: hoursText(h), m: minutesText(r) }) : hoursText(h);
 }
 function etaShort(min) {
   if (min == null || !isFinite(min)) return "—";
-  if (min < 1) return "<1 דק'";
+  if (min < 1) return t("u.lt_min");
   const m = Math.round(min);
-  if (m < 60) return `${m} דק'`;
-  if (m >= 48 * 60) return `${(m / 1440).toFixed(1)} ימים`;
-  return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")} ש'`;
+  if (m < 60) return t("u.min", { n: m });
+  if (m >= 48 * 60) return t("u.days", { n: (m / 1440).toFixed(1) });
+  return t("u.hm", { h: Math.floor(m / 60), mm: String(m % 60).padStart(2, "0") });
 }
 function clock(sec) {
   sec = Math.max(0, Math.ceil(sec));
@@ -45,8 +86,8 @@ function clock(sec) {
   return h ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
 }
 function duration(min) {
-  if (min < 1) return `${Math.round(min * 60)} שנ'`;
-  return `${Math.round(min)} דק'`;
+  if (min < 1) return t("u.sec", { n: Math.round(min * 60) });
+  return t("u.min", { n: Math.round(min) });
 }
 function readingText(r) {
   return `${intFmt.format(r.exp)} [${r.pct.toFixed(2)}%]` + (r.level ? `  Lv.${r.level}` : "");
@@ -56,26 +97,27 @@ function readingText(r) {
 const VIEWS = { idle: "idle", cancelled: "idle", countdown: "countdown", running: "running",
                 finalizing: "finalizing", done: "done", error: "error" };
 const BADGES = {
-  idle: ["מוכן", ""], cancelled: ["מוכן", ""], countdown: ["מתחיל", "live"], running: ["מקליט", "live"],
-  finalizing: ["מסכם", "live"], done: ["הושלם", "done"], error: ["שגיאה", "err"],
+  idle: ["badge.ready", ""], cancelled: ["badge.ready", ""], countdown: ["badge.starting", "live"],
+  running: ["badge.recording", "live"], finalizing: ["badge.summing", "live"], done: ["badge.done", "done"],
+  error: ["badge.error", "err"],
 };
 
 function showView(phase) {
   const name = VIEWS[phase] || "idle";
   document.querySelectorAll(".view").forEach((v) => { v.hidden = v.id !== `view-${name}`; });
-  const [text, cls] = BADGES[phase] || BADGES.idle;
+  const [key, cls] = BADGES[phase] || BADGES.idle;
   const b = $("phaseBadge");
-  b.textContent = text;
+  b.textContent = t(key);
   b.className = "badge " + cls;
 }
 
 function renderGame(g) {
   const chip = $("gameChip");
   gameFound = g.found && !g.minimized;
-  // \u2066…\u2069 isolates the LTR size so RTL layout doesn't flip "1920×1200"
-  if (g.found && !g.minimized) { chip.className = "chip ok"; $("gameText").textContent = `המשחק מחובר · \u2066${g.size}\u2069`; }
-  else if (g.minimized) { chip.className = "chip warn"; $("gameText").textContent = "המשחק ממוזער"; }
-  else { chip.className = "chip bad"; $("gameText").textContent = "MapleStory לא פתוח"; }
+  // ⁦…⁩ isolates the LTR size so RTL layout doesn't flip "1920×1200"
+  if (g.found && !g.minimized) { chip.className = "chip ok"; $("gameText").textContent = t("game.ok", { size: `⁦${g.size}⁩` }); }
+  else if (g.minimized) { chip.className = "chip warn"; $("gameText").textContent = t("game.minimized"); }
+  else { chip.className = "chip bad"; $("gameText").textContent = t("game.missing"); }
   $("startBtn").disabled = !gameFound;
   $("testBtn").disabled = !gameFound;
 }
@@ -91,26 +133,27 @@ function renderRunning(s) {
     $("liveGained").textContent = signed(live.exp_gained);
     $("liveEta").textContent = etaShort(live.eta_minutes);
     const n = live.levels_gained;
-    const lv = n === 1 ? " · עלית רמה!" : n > 1 ? ` · עלית ${n} רמות!` : "";
-    $("liveStatus").textContent = `קריאה אחרונה לפני ${Math.round(live.last_ago)} שנ' · ${live.pct.toFixed(2)}%${lv}`;
+    const lv = n === 1 ? t("run.level_up") : n > 1 ? t("run.levels_up", { n }) : "";
+    $("liveStatus").textContent = t("run.last", { s: Math.round(live.last_ago), pct: live.pct.toFixed(2) }) + lv;
   } else {
     $("liveRate").textContent = "—"; $("liveGained").textContent = "—"; $("liveEta").textContent = "—";
-    $("liveStatus").textContent = "מחכה לקריאה הבאה (כל 10 שניות)…";
+    $("liveStatus").textContent = t("run.waiting");
   }
-  if (s.failed_reads) $("liveStatus").textContent += ` · ${s.failed_reads} קריאות דולגו`;
+  if (s.failed_reads) $("liveStatus").textContent += t("run.skipped", { n: s.failed_reads });
 }
 
 function renderDone(s) {
   const r = s.result;
-  $("timerTitle").textContent = "סיכום סשן" + (s.map ? ` · \u2066${s.map}\u2069` : "");
-  $("doneWarn").hidden = !s.warning;
-  $("doneWarn").textContent = s.warning || "";
+  $("timerTitle").textContent = t("timer.summary") + (s.map ? ` · ⁦${s.map}⁩` : "");
+  const warning = warnText(s.warning, s.warning_reason);
+  $("doneWarn").hidden = !warning;
+  $("doneWarn").textContent = warning;
   $("resRate").textContent = num(r.exp_per_min);
   $("resHour").textContent = num(r.exp_per_hour);
   $("resEta").textContent = r.eta_minutes == null ? "—" : etaLong(r.eta_minutes);
-  const lvl = r.level ? `רמה ${r.level} ← ${r.level + 1}` : "";
+  const lvl = r.level ? t("done.lvl", { a: r.level, b: r.level + 1 }) : "";
   $("resEtaSub").textContent = r.exp_to_level == null ? "" :
-    (r.eta_minutes == null ? `צריך עוד ${num(r.exp_to_level)} EXP` : `עוד ${num(r.exp_to_level)} EXP · ${lvl}`);
+    (r.eta_minutes == null || !lvl ? t("done.need", { n: num(r.exp_to_level) }) : t("done.left", { n: num(r.exp_to_level), lvl }));
   $("resGained").textContent = signed(r.exp_gained);
   $("resGained").className = r.exp_gained >= 0 ? "up" : "down";
   $("resPct").textContent = (r.pct_gained >= 0 ? "+" : "") + r.pct_gained.toFixed(2) + "%";
@@ -122,7 +165,7 @@ function renderDone(s) {
   $("endRow").hidden = !s.end;
   if (s.end) { $("endCrop").src = s.end.crop; $("endVals").textContent = readingText(s.end); }
 
-  $("mapVal").textContent = s.map || "לא זוהתה. אפשר להוסיף בתיקון ידני";
+  $("mapVal").textContent = s.map || t("done.map_none");
   $("mapVal").className = "proof-map" + (s.map ? "" : " missing");
   $("eMap").value = s.map || "";
   $("eStartExp").value = s.start.exp; $("eStartPct").value = s.start.pct;
@@ -170,10 +213,10 @@ async function tick() {
   if (s.phase !== lastPhase && s.phase === "countdown" && s.game.overlay && !compact) setCompact(true, false);
   if (s.phase !== lastPhase) {
     showView(s.phase);
-    if (s.phase === "idle" || s.phase === "cancelled") $("timerTitle").textContent = "טיימר פארם";
-    if (s.phase === "running" || s.phase === "countdown") $("timerTitle").textContent = "טיימר פארם" + (s.map ? ` · \u2066${s.map}\u2069` : "");
+    if (s.phase === "idle" || s.phase === "cancelled") $("timerTitle").textContent = t("timer.title");
+    if (s.phase === "running" || s.phase === "countdown") $("timerTitle").textContent = t("timer.title") + (s.map ? ` · ⁦${s.map}⁩` : "");
     if (s.phase === "done") { renderDone(s); $("editForm").hidden = true; loadHistory(); }
-    if (s.phase === "error") $("errorText").textContent = s.error;
+    if (s.phase === "error") $("errorText").textContent = errText(s.error, s.error_detail);
     lastPhase = s.phase;
   }
   if (s.phase === "countdown") $("countdownNum").textContent = Math.max(1, Math.ceil(s.countdown));
@@ -184,13 +227,17 @@ async function tick() {
 function setMinutes(m) {
   $("minutes").value = m;
   const pick = $("cMinutes");
-  if (pick && ![...pick.options].some((o) => +o.value === +m)) pick.add(new Option(`${m} דק'`, m));
+  if (pick && ![...pick.options].some((o) => +o.value === +m)) {
+    const o = new Option(t("u.min", { n: m }), m);
+    o.dataset.i18n = "u.min"; o.dataset.n = m;  // relabelled when the language changes
+    pick.add(o);
+  }
   if (pick) pick.value = String(+m);
-  document.querySelectorAll("#presets .tab").forEach((t) => t.classList.toggle("active", +t.dataset.min === +m));
+  document.querySelectorAll("#presets .tab").forEach((tab) => tab.classList.toggle("active", +tab.dataset.min === +m));
 }
 
 function wire() {
-  document.querySelectorAll("#presets .tab").forEach((t) => t.addEventListener("click", () => setMinutes(t.dataset.min)));
+  document.querySelectorAll("#presets .tab").forEach((tab) => tab.addEventListener("click", () => setMinutes(tab.dataset.min)));
   $("minutes").addEventListener("input", () => setMinutes($("minutes").value));
 
   $("startBtn").addEventListener("click", async () => {
@@ -208,9 +255,9 @@ function wire() {
 
   $("testBtn").addEventListener("click", async () => {
     const btn = $("testBtn");
-    btn.disabled = true; btn.textContent = "קורא מהמסך…";
+    btn.disabled = true; btn.textContent = t("idle.testing");
     try { showTest(await api.test_read()); }
-    finally { btn.disabled = !gameFound; btn.textContent = "בדיקת קריאה מהמסך"; }
+    finally { btn.disabled = !gameFound; btn.textContent = t("idle.test"); }
   });
 
   $("editBtn").addEventListener("click", () => { $("editForm").hidden = !$("editForm").hidden; $("editError").hidden = true; });
@@ -218,7 +265,7 @@ function wire() {
     e.preventDefault();
     const res = await api.recompute($("eStartExp").value, $("eStartPct").value,
                                     $("eEndExp").value || 0, $("eEndPct").value || 0, $("eMap").value);
-    if (!res.ok) { $("editError").hidden = false; $("editError").textContent = res.error; return; }
+    if (!res.ok) { $("editError").hidden = false; $("editError").textContent = errText(res.error); return; }
     renderDone(await api.get_state());
     $("editForm").hidden = true;
     loadHistory();
@@ -236,26 +283,28 @@ function wire() {
     store.set("pin", on ? "1" : "0");
     api.set_on_top(on);
   });
+  $("langLink").addEventListener("click", (e) => { e.preventDefault(); switchLang(); });
 }
 
 function showTest(r) {
+  lastTest = r;
   const box = $("testResult");
   box.hidden = false;
   box.replaceChildren();
   box.className = "test-result" + (r.ok ? "" : " bad");
-  if (!r.ok) { box.textContent = r.error; return; }
+  if (!r.ok) { box.textContent = errText(r.error); return; }
   const img = document.createElement("img"); img.src = r.crop; img.alt = "";
-  const t = document.createElement("div"); t.dir = "ltr"; t.textContent = readingText(r);
-  const ok = document.createElement("div"); ok.textContent = "✓ הקריאה עובדת, אפשר להתחיל";
+  const reading = document.createElement("div"); reading.dir = "ltr"; reading.textContent = readingText(r);
+  const ok = document.createElement("div"); ok.textContent = t("idle.test_ok");
   ok.className = "up";
-  box.append(img, t, ok);
+  box.append(img, reading, ok);
   showMap(r.map);
 }
 
 function showMap(name) {
   $("mapNote").classList.toggle("found", !!name);
-  $("mapNoteText").textContent = name || "לא רואה מיני-מפה. תזוהה בתחילת הטיימר אם תיפתח";
-  $("mapNoteText").dir = name ? "ltr" : "rtl";
+  $("mapNoteText").textContent = name || t("idle.map_none");
+  if (name) $("mapNoteText").dir = "ltr"; else $("mapNoteText").removeAttribute("dir");
   $("mapNote").title = name || "";
 }
 
@@ -270,9 +319,12 @@ function wireUpdate() {
   $("updateNotes").addEventListener("click", (e) => { e.preventDefault(); api.open_release(); });
   $("updateBtn").addEventListener("click", async () => {
     const btn = $("updateBtn");
-    btn.disabled = true; btn.textContent = "מעדכן…";
+    btn.disabled = true; btn.textContent = t("up.updating");
     const res = await api.start_update();  // on success the app closes and reopens updated
-    if (!res.ok) { btn.disabled = false; btn.textContent = "עדכון"; $("updateBar").title = res.error; alert(res.error); }
+    if (!res.ok) {
+      btn.disabled = false; btn.textContent = t("up.button");
+      $("updateBar").title = errText(res.error); alert(errText(res.error));
+    }
   });
 }
 
@@ -318,10 +370,10 @@ function renderCompact(s) {
     $("cDoneHour").textContent = shortNum(s.result.exp_per_hour);
     $("cDoneEta").textContent = s.result.eta_minutes == null ? "—" : etaShort(s.result.eta_minutes);
   }
-  if (view === "error") $("cError").textContent = s.error || "";
+  if (view === "error") $("cError").textContent = errText(s.error, s.error_detail);
   $("cStart").disabled = !gameFound;
   const live = s.live || s.result;
-  $("compact").title = live ? `EXP שנצבר: ${signed(live.exp_gained)}` + (s.map ? ` · ${s.map}` : "") : "";
+  $("compact").title = live ? t("c.gained", { n: signed(live.exp_gained) }) + (s.map ? ` · ${s.map}` : "") : "";
 }
 
 function wireCompact() {
@@ -353,6 +405,12 @@ function fitWindow() {
   api.fit_height(total, window.devicePixelRatio || 1);
 }
 
+// a language the user picked applies at once; otherwise the page stays hidden until Python
+// reports the Windows language (i18n-wait), so it never flashes the wrong one
+const savedLang = store.get("lang", "");
+if (savedLang) applyLang(savedLang);
+setTimeout(() => document.documentElement.classList.remove("i18n-wait"), 2000);  // never stay hidden
+
 window.addEventListener("pywebviewready", () => {
   api = window.pywebview.api;
   setMinutes(store.get("minutes", "10"));
@@ -361,7 +419,10 @@ window.addEventListener("pywebviewready", () => {
   wireUpdate();
   wireCompact();
   if (store.get("compact", "0") === "1") setCompact(true);
-  api.app_info().then((i) => { $("appVersion").textContent = "v" + i.version; });
+  api.app_info().then((i) => {
+    $("appVersion").textContent = "v" + i.version;
+    if (!savedLang) { applyLang(i.lang); lastPhase = null; tick(); }
+  });
   api.check_update().then(showUpdate);
   $("repoLink").addEventListener("click", (e) => { e.preventDefault(); api.open_repo(); });
   loadHistory();

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" class="i18n-wait">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -45,16 +45,16 @@
     <span class="wordmark"><span class="wm-base">EXPERT</span><span class="wm-fill" aria-hidden="true">EXP</span></span>
   </div>
   <div class="tb-buttons">
-    <button class="tb-btn active" id="pinBtn" title="תמיד מעל שאר החלונות" aria-label="תמיד מעל" aria-pressed="true">
+    <button class="tb-btn active" id="pinBtn" data-i18n-title="tb.pin" aria-pressed="true">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3l6 6-3 1-4 4 1 5-2 2-4-5-5 5-1-1 5-5-5-4 2-2 5 1 4-4z" fill="currentColor"/></svg>
     </button>
-    <button class="tb-btn" id="compactBtn" title="מצב קומפקטי" aria-label="מצב קומפקטי">
+    <button class="tb-btn" id="compactBtn" data-i18n-title="tb.compact">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4v6H4M14 20v-6h6M10 10L4 4M14 14l6 6" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
     </button>
-    <button class="tb-btn" id="minBtn" title="מזער" aria-label="מזער">
+    <button class="tb-btn" id="minBtn" data-i18n-title="tb.min">
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="3" rx="1.5" fill="currentColor"/></svg>
     </button>
-    <button class="tb-btn close" id="closeBtn" title="סגור" aria-label="סגור">
+    <button class="tb-btn close" id="closeBtn" data-i18n-title="tb.close">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
     </button>
   </div>
@@ -64,29 +64,30 @@
 <div class="compact pywebview-drag-region" id="compact" dir="ltr">
   <svg class="c-watch" viewBox="0 0 64 64" aria-hidden="true"><use href="#watchSym"/></svg>
   <span class="c-view" data-phase="idle">
-    <select class="c-dur" id="cMinutes" title="כמה דקות">
-      <option value="5">5 דק'</option><option value="10">10 דק'</option><option value="15">15 דק'</option>
-      <option value="30">30 דק'</option><option value="60">שעה</option>
+    <select class="c-dur" id="cMinutes" data-i18n-title="c.minutes">
+      <option value="5" data-i18n="u.min" data-n="5"></option><option value="10" data-i18n="u.min" data-n="10"></option>
+      <option value="15" data-i18n="u.min" data-n="15"></option><option value="30" data-i18n="u.min" data-n="30"></option>
+      <option value="60" data-i18n="u.hour1"></option>
     </select>
-    <button class="c-btn go" id="cStart" title="התחל טיימר" aria-label="התחל טיימר"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button>
+    <button class="c-btn go" id="cStart" data-i18n-title="c.start"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button>
   </span>
   <span class="c-view" data-phase="countdown">
-    <b class="num" id="cCount">3</b><small>חזור למשחק…</small>
-    <button class="c-btn stop" id="cCancel" title="ביטול" aria-label="ביטול"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg></button>
+    <b class="num" id="cCount">3</b><small data-i18n="c.back"></small>
+    <button class="c-btn stop" id="cCancel" data-i18n-title="common.cancel"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg></button>
   </span>
   <span class="c-view" data-phase="running">
-    <b class="num" id="cClock">0:00</b><i class="sep"></i><b class="num" id="cRate">—</b><small>/דק'</small>
-    <button class="c-btn stop" id="cStop" title="עצור וסכם" aria-label="עצור וסכם"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg></button>
+    <b class="num" id="cClock">0:00</b><i class="sep"></i><b class="num" id="cRate">—</b><small data-i18n="u.per_min"></small>
+    <button class="c-btn stop" id="cStop" data-i18n-title="c.stop"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg></button>
   </span>
-  <span class="c-view" data-phase="finalizing"><small>מסכם…</small></span>
+  <span class="c-view" data-phase="finalizing"><small data-i18n="c.summing"></small></span>
   <span class="c-view" data-phase="done">
-    <span class="c-ok">✓</span><b class="num" id="cDoneRate"></b><small>/דק'</small><i class="sep"></i>
-    <b class="num" id="cDoneHour"></b><small>/שעה</small><i class="sep"></i>
-    <b class="num" id="cDoneEta"></b><small>לרמה</small>
-    <button class="c-btn ghost" id="cAgain" title="טיימר חדש" aria-label="טיימר חדש"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.05-4.95M19 4v4h-4" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <span class="c-ok">✓</span><b class="num" id="cDoneRate"></b><small data-i18n="u.per_min"></small><i class="sep"></i>
+    <b class="num" id="cDoneHour"></b><small data-i18n="u.per_hour"></small><i class="sep"></i>
+    <b class="num" id="cDoneEta"></b><small data-i18n="c.to_level"></small>
+    <button class="c-btn ghost" id="cAgain" data-i18n-title="c.again"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.05-4.95M19 4v4h-4" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   </span>
   <span class="c-view" data-phase="error"><span class="c-warn">!</span><small id="cError"></small></span>
-  <button class="c-btn ghost" id="cExpand" title="חלון מלא" aria-label="חלון מלא"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-6 6M4 20l6-6" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg></button>
+  <button class="c-btn ghost" id="cExpand" data-i18n-title="c.expand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-6 6M4 20l6-6" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg></button>
 </div>
 
 <div class="scroll">
@@ -95,134 +96,134 @@
 <div id="content">
 <div class="update-bar" id="updateBar" hidden>
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 7h-4.5v8h-5v-8H5z" fill="currentColor"/></svg>
-  <span class="update-text">גרסה <b dir="ltr" id="updateVersion"></b> זמינה</span>
-  <a href="#" id="updateNotes">מה חדש</a>
-  <button class="update-btn" id="updateBtn">עדכון</button>
+  <span class="update-text"><span data-i18n="up.version"></span> <b dir="ltr" id="updateVersion"></b> <span data-i18n="up.available"></span></span>
+  <a href="#" id="updateNotes" data-i18n="up.notes"></a>
+  <button class="update-btn" id="updateBtn" data-i18n="up.button"></button>
 </div>
 <div class="status-row">
-  <span class="chip" id="gameChip"><i class="dot"></i><span id="gameText">מחפש את המשחק…</span></span>
+  <span class="chip" id="gameChip"><i class="dot"></i><span id="gameText" data-i18n="game.searching"></span></span>
   <span class="tagline" dir="ltr"><b>EXP</b> PER <b>T</b>IME</span>
 </div>
 
 <main>
   <section class="window">
-    <div class="window-title"><h2 id="timerTitle">טיימר פארם</h2><span class="badge" id="phaseBadge">מוכן</span></div>
+    <div class="window-title"><h2 id="timerTitle" data-i18n="timer.title"></h2><span class="badge" id="phaseBadge" data-i18n="badge.ready"></span></div>
     <div class="window-body">
 
       <div class="view" id="view-idle">
-        <div class="field-label">כמה זמן לפארם?</div>
+        <div class="field-label" data-i18n="idle.how_long"></div>
         <div class="tabs" id="presets">
-          <button class="tab" data-min="5">5 דק'</button>
-          <button class="tab active" data-min="10">10 דק'</button>
-          <button class="tab" data-min="15">15 דק'</button>
-          <button class="tab" data-min="30">30 דק'</button>
-          <button class="tab" data-min="60">שעה</button>
+          <button class="tab" data-min="5" data-i18n="u.min" data-n="5"></button>
+          <button class="tab active" data-min="10" data-i18n="u.min" data-n="10"></button>
+          <button class="tab" data-min="15" data-i18n="u.min" data-n="15"></button>
+          <button class="tab" data-min="30" data-i18n="u.min" data-n="30"></button>
+          <button class="tab" data-min="60" data-i18n="u.hour1"></button>
         </div>
         <div class="row">
-          <label class="field narrow"><span>דקות</span><input id="minutes" type="number" min="1" max="600" step="1" value="10" dir="ltr"></label>
+          <label class="field narrow"><span data-i18n="idle.minutes"></span><input id="minutes" type="number" min="1" max="600" step="1" value="10" dir="ltr"></label>
           <div class="field grow">
-            <span>מפה</span>
+            <span data-i18n="idle.map"></span>
             <div class="map-note" id="mapNote">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5 7 12 7 12s7-7 7-12a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" fill="currentColor"/></svg>
-              <span id="mapNoteText">תזוהה אוטומטית מהמיני-מפה</span>
+              <span id="mapNoteText" data-i18n="idle.map_auto"></span>
             </div>
           </div>
         </div>
         <button class="big-btn" id="startBtn">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
-          התחל טיימר
+          <span data-i18n="idle.start"></span>
         </button>
-        <p class="hint" id="startHint">אחרי הלחיצה יש 3 שניות לחזור למשחק, ואז צילום ראשון.</p>
-        <button class="ghost-btn wide" id="testBtn">בדיקת קריאה מהמסך</button>
+        <p class="hint" id="startHint" data-i18n="idle.hint"></p>
+        <button class="ghost-btn wide" id="testBtn" data-i18n="idle.test"></button>
         <div class="test-result" id="testResult" hidden></div>
       </div>
 
       <div class="view" id="view-countdown" hidden>
         <div class="countdown" id="countdownNum">3</div>
-        <p class="hint center">חזור למשחק, הצילום הראשון עוד רגע…</p>
-        <button class="ghost-btn wide" id="cancelBtn">ביטול</button>
+        <p class="hint center" data-i18n="cd.hint"></p>
+        <button class="ghost-btn wide" id="cancelBtn" data-i18n="common.cancel"></button>
       </div>
 
       <div class="view" id="view-running" hidden>
         <div class="clock" dir="ltr" id="clock">10:00</div>
         <div class="expbar"><div class="expbar-fill" id="progress"></div><span class="expbar-text" id="progressText"></span></div>
         <div class="tiles three">
-          <div class="stat"><div class="stat-label">EXP לדקה</div><div class="stat-value" dir="ltr" id="liveRate">—</div></div>
-          <div class="stat"><div class="stat-label">EXP שנצבר</div><div class="stat-value" dir="ltr" id="liveGained">—</div></div>
-          <div class="stat"><div class="stat-label">זמן לרמה</div><div class="stat-value" id="liveEta">—</div></div>
+          <div class="stat"><div class="stat-label" data-i18n="stat.per_min"></div><div class="stat-value" dir="ltr" id="liveRate">—</div></div>
+          <div class="stat"><div class="stat-label" data-i18n="stat.gained"></div><div class="stat-value" dir="ltr" id="liveGained">—</div></div>
+          <div class="stat"><div class="stat-label" data-i18n="stat.eta"></div><div class="stat-value" id="liveEta">—</div></div>
         </div>
         <p class="status-line" id="liveStatus"></p>
         <button class="stop-btn" id="stopBtn">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>
-          עצור עכשיו וסכם
+          <span data-i18n="run.stop"></span>
         </button>
       </div>
 
       <div class="view" id="view-finalizing" hidden>
         <div class="spinner" aria-hidden="true"></div>
-        <p class="hint center">מצלם את המסך האחרון ומחשב…</p>
+        <p class="hint center" data-i18n="fin.hint"></p>
       </div>
 
       <div class="view" id="view-done" hidden>
         <div class="warn" id="doneWarn" hidden></div>
         <div class="tiles two">
-          <div class="stat hero"><div class="stat-label">EXP לדקה</div><div class="stat-value" dir="ltr" id="resRate">—</div></div>
-          <div class="stat hero"><div class="stat-label">EXP לשעה</div><div class="stat-value" dir="ltr" id="resHour">—</div></div>
+          <div class="stat hero"><div class="stat-label" data-i18n="stat.per_min"></div><div class="stat-value" dir="ltr" id="resRate">—</div></div>
+          <div class="stat hero"><div class="stat-label" data-i18n="stat.per_hour"></div><div class="stat-value" dir="ltr" id="resHour">—</div></div>
         </div>
         <div class="stat hero gold">
-          <div class="ribbon">זמן לרמה הבאה</div>
+          <div class="ribbon" data-i18n="done.eta"></div>
           <div class="stat-value xl" id="resEta">—</div>
           <div class="stat-sub" id="resEtaSub"></div>
         </div>
         <div class="facts">
-          <div><span>סה"כ EXP</span><b dir="ltr" id="resGained">—</b></div>
-          <div><span>אחוזים</span><b dir="ltr" id="resPct">—</b></div>
-          <div><span>רמות</span><b dir="ltr" id="resLevels">—</b></div>
-          <div><span>משך</span><b id="resMinutes">—</b></div>
+          <div><span data-i18n="done.total"></span><b dir="ltr" id="resGained">—</b></div>
+          <div><span data-i18n="done.pct"></span><b dir="ltr" id="resPct">—</b></div>
+          <div><span data-i18n="done.levels"></span><b dir="ltr" id="resLevels">—</b></div>
+          <div><span data-i18n="done.duration"></span><b id="resMinutes">—</b></div>
         </div>
         <div class="proof">
-          <div class="proof-head"><h3>מה נקרא מהמסך</h3><button class="link-btn" id="editBtn">תיקון ידני</button></div>
-          <div class="proof-row"><span class="proof-label">התחלה</span><img id="startCrop" alt=""><span class="proof-vals" dir="ltr" id="startVals"></span></div>
-          <div class="proof-row" id="endRow"><span class="proof-label">סיום</span><img id="endCrop" alt=""><span class="proof-vals" dir="ltr" id="endVals"></span></div>
-          <div class="proof-row"><span class="proof-label">מפה</span><span class="proof-map" id="mapVal"></span></div>
+          <div class="proof-head"><h3 data-i18n="done.read"></h3><button class="link-btn" id="editBtn" data-i18n="done.fix"></button></div>
+          <div class="proof-row"><span class="proof-label" data-i18n="done.start"></span><img id="startCrop" alt=""><span class="proof-vals" dir="ltr" id="startVals"></span></div>
+          <div class="proof-row" id="endRow"><span class="proof-label" data-i18n="done.end"></span><img id="endCrop" alt=""><span class="proof-vals" dir="ltr" id="endVals"></span></div>
+          <div class="proof-row"><span class="proof-label" data-i18n="done.map"></span><span class="proof-map" id="mapVal"></span></div>
           <form class="edit" id="editForm" hidden>
             <div class="edit-grid">
               <span></span><span class="edit-h">EXP</span><span class="edit-h">%</span>
-              <span class="proof-label">התחלה</span><input id="eStartExp" type="number" min="0" dir="ltr"><input id="eStartPct" type="number" min="0" max="100" step="0.01" dir="ltr">
-              <span class="proof-label edit-end">סיום</span><input class="edit-end" id="eEndExp" type="number" min="0" dir="ltr"><input class="edit-end" id="eEndPct" type="number" min="0" max="100" step="0.01" dir="ltr">
-              <span class="proof-label">מפה</span><input class="edit-map" id="eMap" type="text" maxlength="60" dir="ltr" placeholder="Tree Dungeon, Forest Up North IV">
+              <span class="proof-label" data-i18n="done.start"></span><input id="eStartExp" type="number" min="0" dir="ltr"><input id="eStartPct" type="number" min="0" max="100" step="0.01" dir="ltr">
+              <span class="proof-label edit-end" data-i18n="done.end"></span><input class="edit-end" id="eEndExp" type="number" min="0" dir="ltr"><input class="edit-end" id="eEndPct" type="number" min="0" max="100" step="0.01" dir="ltr">
+              <span class="proof-label" data-i18n="done.map"></span><input class="edit-map" id="eMap" type="text" maxlength="60" dir="ltr" placeholder="Tree Dungeon, Forest Up North IV">
             </div>
             <div class="edit-error" id="editError" hidden></div>
-            <button class="ghost-btn wide" type="submit">חשב מחדש</button>
+            <button class="ghost-btn wide" type="submit" data-i18n="done.recalc"></button>
           </form>
         </div>
         <div class="row">
-          <button class="big-btn grow" id="againBtn">טיימר חדש</button>
-          <button class="ghost-btn" id="shotsBtn" title="פתח את תיקיית הצילומים">
+          <button class="big-btn grow" id="againBtn" data-i18n="done.again"></button>
+          <button class="ghost-btn" id="shotsBtn" data-i18n-title="done.shots_title">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.6l2 2h8.4A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z" fill="currentColor"/></svg>
-            צילומים
+            <span data-i18n="done.shots"></span>
           </button>
         </div>
       </div>
 
       <div class="view" id="view-error" hidden>
         <div class="error-box" id="errorText"></div>
-        <button class="big-btn" id="backBtn">חזרה</button>
+        <button class="big-btn" id="backBtn" data-i18n="common.back"></button>
       </div>
 
     </div>
   </section>
 
   <section class="window">
-    <div class="window-title"><h2>היסטוריה</h2><span class="badge real">סשנים אחרונים</span></div>
+    <div class="window-title"><h2 data-i18n="hist.title"></h2><span class="badge real" data-i18n="hist.badge"></span></div>
     <div class="window-body flush">
       <div class="table-wrap">
         <table class="hist">
-          <thead><tr><th>מתי</th><th>מפה</th><th>דק'</th><th>EXP/דקה</th><th>רמות</th></tr></thead>
+          <thead><tr><th data-i18n="hist.when"></th><th data-i18n="hist.map"></th><th data-i18n="hist.min"></th><th data-i18n="hist.rate"></th><th data-i18n="hist.levels"></th></tr></thead>
           <tbody id="histBody"></tbody>
         </table>
       </div>
-      <p class="empty" id="histEmpty">עוד אין סשנים. תריץ את הראשון!</p>
+      <p class="empty" id="histEmpty" data-i18n="hist.empty"></p>
     </div>
   </section>
 </main>
@@ -232,10 +233,13 @@
   <span>by <b>ORYANZ</b></span>
   <span class="sep">·</span>
   <a href="#" id="repoLink">GitHub</a>
+  <span class="sep">·</span>
+  <a href="#" id="langLink" data-i18n="lang.switch"></a>
 </footer>
 </div>
 </div>
 
+<script src="i18n.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
