@@ -1,20 +1,20 @@
 ---
-name: Bug report / דיווח על באג
+name: Bug report
 about: Something doesn't work as expected
 labels: bug
 ---
 
-**What happened? / מה קרה?**
+**What happened?**
 
 
-**What did you expect? / מה ציפית שיקרה?**
+**What did you expect?**
 
 
-**Steps to reproduce / איך לשחזר**
+**Steps to reproduce**
 1.
 2.
 
-**Setup / סביבה**
+**Setup**
 - Windows version:
 - Game window size (shown in the EXPERT status chip, e.g. 1920×1200):
 - EXPERT version (bottom of the window):

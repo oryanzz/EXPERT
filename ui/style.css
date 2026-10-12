@@ -404,4 +404,4 @@ html[dir="rtl"] .compact small { direction: rtl; }  /* Hebrew labels inside the 
 
 /* until the UI language is known (first start): stay hidden rather than flash the wrong one */
 .i18n-wait body { visibility: hidden; }
-html[dir="rtl"] #cDoneEta { direction: rtl; unicode-bidi: isolate; }  /* "50 דק'" inside the LTR strip */
+html[dir="rtl"] #cDoneEta { direction: rtl; unicode-bidi: isolate; }  /* Hebrew "50 min" inside the LTR strip */

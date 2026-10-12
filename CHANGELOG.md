@@ -12,7 +12,7 @@ All notable changes to EXPERT are listed here. The project follows
   `ui/i18n.js`, so adding a language is one file.
 
 ### Fixed
-- In the Hebrew compact strip, the time to level ("50 דק'") showed its unit on the wrong side.
+- In the Hebrew compact strip, the time to level showed its unit on the wrong side.
 
 ## [1.3.1] - 2026-10-11
 
@@ -61,7 +61,7 @@ All notable changes to EXPERT are listed here. The project follows
 ## [1.0.3] - 2026-10-11
 
 ### Changed
-- The update button is now a single word: `עדכון`.
+- The update button is now a single word.
 
 ## [1.0.2] - 2026-10-11
 

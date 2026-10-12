@@ -1,13 +1,13 @@
 ---
-name: Feature idea / רעיון לפיצ'ר
+name: Feature idea
 about: Suggest something that would make EXPERT better
 labels: enhancement
 ---
 
-**What would you like? / מה היית רוצה?**
+**What would you like?**
 
 
-**Why is it useful? / למה זה שימושי?**
+**Why is it useful?**
 
 
 <!-- Note: EXPERT works only from screenshots. Ideas that need game memory, injection or
